@@ -1,6 +1,5 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System.Text.Json.Serialization;
 
 namespace ECommerce.Api.Entities
 {
@@ -13,6 +12,13 @@ namespace ECommerce.Api.Entities
         public string? ProductDescription { get; set; }
         public decimal Price { get; set; }
         public string? ProductCategory { get; set; }
+        public int Quantity { get; set; }
         public bool IsAvailable { get; set; }
+
+        public void SetQuantity(int quantity)
+        {
+            Quantity = quantity;
+            IsAvailable = Quantity > 0;
+        }
     }
 }

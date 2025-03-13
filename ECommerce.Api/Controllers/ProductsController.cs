@@ -1,5 +1,8 @@
-﻿using ECommerce.Api.Entities;
+﻿using ECommerce.Api.Dtos;
+using ECommerce.Api.Entities;
+using ECommerce.Api.Mapper;
 using ECommerce.Api.Repository;
+using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,26 +22,39 @@ namespace ECommerce.Api.Controllers
         public async Task<IActionResult> GetAll()
         {
             var products = await _repository.GetAllAsync();
-            return Ok(products);
+            return Ok(products.ToProductDtos());
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
-            var products = await _repository.GetByIdAsync(id);
-            return Ok(products);
+            var product = await _repository.GetByIdAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+            return Ok(product.ToProductDto());
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Product product)
+        public async Task<IActionResult> Create(ProductDto productDto)
         {
+            var product = productDto.ToProduct();
             await _repository.CreateAsync(product);
-            return Ok(product);
+            return Ok(product.ToProductDto());
         }
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, Product product)
+        public async Task<IActionResult> Update(string id, ProductDto productDto)
         {
-            await _repository.UpdateAsync(id, product);
-            return Ok(product);
+            var existingProduct = await _repository.GetByIdAsync(id);
+            if (existingProduct == null)
+            {
+                return NotFound();
+            }
+            existingProduct.UpdateProduct(productDto);
+            await _repository.UpdateAsync(id, existingProduct);
+            return Ok(existingProduct.ToProductDto());
+
         }
 
         [HttpDelete("{id}")]
@@ -47,6 +63,8 @@ namespace ECommerce.Api.Controllers
             await _repository.DeleteAsync(id);
             return Ok(new{ Success = true, Message = "Product deleted" });
         }
+
+        //[HttpPatch("{id}/status")]
 
     }
 }

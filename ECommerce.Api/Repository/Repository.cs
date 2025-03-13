@@ -1,9 +1,8 @@
-﻿
-using ECommerce.Api.Settings;
+﻿using ECommerce.Api.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using System.Runtime.InteropServices;
+
 
 namespace ECommerce.Api.Repository
 {
@@ -17,7 +16,7 @@ namespace ECommerce.Api.Repository
             _collection = database.GetCollection<T>(typeof(T).Name);
         }
 
-        public async Task CreateAsync(T entity)
+        public virtual async Task CreateAsync(T entity)
         {
             await _collection.InsertOneAsync(entity);
         }
@@ -34,7 +33,7 @@ namespace ECommerce.Api.Repository
             return await _collection.Find(Builders<T>.Filter.Eq("_id", objectId)).FirstOrDefaultAsync();
         }
 
-        public async Task UpdateAsync(string id, T entity)
+        public virtual async Task UpdateAsync(string id, T entity)
         {
             var objectId = new ObjectId(id);
             await _collection.ReplaceOneAsync(Builders<T>.Filter.Eq("_id", objectId), entity);
