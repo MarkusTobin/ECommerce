@@ -16,13 +16,13 @@ namespace ECommerce.Api.Repository
 
         public override async Task CreateAsync(Product product)
         {
-            product.SetQuantity(product.Quantity);
+          //  product.SetQuantity(product.Quantity);
             await base.CreateAsync(product);
         }
 
         public override async Task UpdateAsync(string id, Product product)
         {
-            product.SetQuantity(product.Quantity);
+          //  product.SetQuantity(product.Quantity);
             await base.UpdateAsync(id, product);
         }
     }
