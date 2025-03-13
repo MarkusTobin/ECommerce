@@ -14,11 +14,14 @@ namespace ECommerce.Api.Entities
         public string? ProductCategory { get; set; }
         public int Quantity { get; set; }
         public bool IsAvailable { get; set; }
+        public bool IsForSale { get; set; }
 
         public void SetQuantity(int quantity)
         {
             Quantity = quantity;
-            IsAvailable = Quantity > 0;
+            // There is some issues here with the Patch api call which always sets IsAvailable to true due to quantity
+            // IsAvailable = Quantity > 0;
         }
+
     }
 }

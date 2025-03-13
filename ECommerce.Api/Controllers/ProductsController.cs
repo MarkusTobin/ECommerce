@@ -61,10 +61,22 @@ namespace ECommerce.Api.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             await _repository.DeleteAsync(id);
-            return Ok(new{ Success = true, Message = "Product deleted" });
+            return Ok(new { Success = true, Message = "Product deleted" });
         }
 
-        //[HttpPatch("{id}/status")]
+        [HttpPatch("{id}/Status")]
+        public async Task<IActionResult> UpdateStatus(string id, [FromBody] bool isAvailable)
+        {
+            var existingProduct = await _repository.GetByIdAsync(id);
+            if (existingProduct == null)
+            {
+                return NotFound();
+            }
+            existingProduct.IsAvailable = isAvailable;
+            await _repository.UpdateAsync(id, existingProduct);
+            return Ok(existingProduct.ToProductDto());
+        }
+
 
     }
 }

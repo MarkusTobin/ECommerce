@@ -1,9 +1,13 @@
-﻿using System.Text.Json.Serialization;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+using System.Text.Json.Serialization;
 
 namespace ECommerce.Api.Entities
 {
     public class Customer
     {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
