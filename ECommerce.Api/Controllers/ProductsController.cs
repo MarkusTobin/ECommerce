@@ -8,22 +8,23 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/products")]
     [ApiController]
     public class ProductsController : ControllerBase
     {
         private readonly IProductRepository _repository;
-
         public ProductsController(IProductRepository productRepository)
         {
             _repository = productRepository;
         }
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var products = await _repository.GetAllAsync();
             return Ok(products.ToProductDtos());
         }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
@@ -57,26 +58,31 @@ namespace ECommerce.Api.Controllers
 
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
-        {
-            await _repository.DeleteAsync(id);
-            return Ok(new { Success = true, Message = "Product deleted" });
-        }
-
-        [HttpPatch("{id}/Status")]
-        public async Task<IActionResult> UpdateStatus(string id, [FromBody] bool isAvailable)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> UpdateStatus(string id, [FromBody] ProductDto productDto)
         {
             var existingProduct = await _repository.GetByIdAsync(id);
             if (existingProduct == null)
             {
-                return NotFound();
+                return NotFound("Product not found");
             }
-            existingProduct.IsAvailable = isAvailable;
+            existingProduct.UpdateProduct(productDto);
             await _repository.UpdateAsync(id, existingProduct);
             return Ok(existingProduct.ToProductDto());
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var product = await _repository.GetByIdAsync(id);
+            if (product == null)
+            {
+                return NotFound("Product not found");
+            }
+
+            await _repository.DeleteAsync(id);
+            return Ok(new { Success = true, Message = $"Product '{product.Name}' successfully deleted" });
+        }
 
     }
 }
