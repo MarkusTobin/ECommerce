@@ -37,7 +37,7 @@ namespace ECommerce.Api.Controllers
             return Ok(customer.ToCustomerDto());
         }
 
-        [HttpGet("search/{email:regex(^[a-zA-Z0-9@._%+-]+$)}")] //regex is need for the email special characters
+        [HttpGet("search/{email}")]
         public async Task<IActionResult> GetByEmail(string email)
         {
             var customer = await _repository.GetByEmailAsync(email);

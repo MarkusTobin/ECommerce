@@ -36,6 +36,27 @@ namespace ECommerce.Api.Controllers
             return Ok(product.ToProductDto());
         }
 
+        [HttpGet("search/name/{name}")]
+        public async Task<IActionResult> GetByProductName(string name)
+        {
+            var product = await _repository.GetProductByName(name);
+            if (product == null)
+            {
+                return NotFound();
+            }
+            return Ok(product.ToProductDto());
+        }
+        [HttpGet("search/productNumber/{productNumber}")]
+        public async Task<IActionResult> GetByProductNumber(string productNumber)
+        {
+            var product = await _repository.GetProductByProductNumber(productNumber);
+            if (product == null)
+            {
+                return NotFound();
+            }
+            return Ok(product.ToProductDto());
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(ProductDto productDto)
         {

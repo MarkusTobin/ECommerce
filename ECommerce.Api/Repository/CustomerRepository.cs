@@ -23,7 +23,9 @@ namespace ECommerce.Api.Repository
 
         public async Task<Customer> GetByEmailAsync(string email)
         {
-            return await _collection.Find(c => c.Email == email).FirstOrDefaultAsync();
+            // Case insentivity
+            var filter = Builders<Customer>.Filter.Regex(c => c.Email, new MongoDB.Bson.BsonRegularExpression(email, "i"));
+            return await _collection.Find(filter).FirstOrDefaultAsync();
         }
     }
 }
