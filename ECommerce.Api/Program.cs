@@ -1,4 +1,5 @@
 using ECommerce.Api.Repository;
+using ECommerce.Api.Services;
 using ECommerce.Api.Settings;
 using Microsoft.OpenApi.Models;
 
@@ -13,6 +14,9 @@ builder.Services.Configure<MongoDBSettings>(
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 
 builder.Services.AddControllers();

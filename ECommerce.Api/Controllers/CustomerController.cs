@@ -2,6 +2,7 @@
 using ECommerce.Api.Entities;
 using ECommerce.Api.Mapper;
 using ECommerce.Api.Repository;
+using ECommerce.Api.Services;
 using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,34 +14,31 @@ namespace ECommerce.Api.Controllers
     [ApiController]
     public class CustomerController : ControllerBase
     {
-        private readonly ICustomerRepository _repository;
-        public CustomerController(ICustomerRepository customerRepository)
-        {
-            _repository = customerRepository;
-        }
+        private readonly ICustomerService _customerService;
 
+        public CustomerController(ICustomerService customerService) => _customerService = customerService;
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var customers = await _repository.GetAllAsync();
-            return Ok(customers.ToCustomerDtos());
+            var customers = await _customerService.GetCustomersAsync();
+            return Ok(customers);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
-            var customer = await _repository.GetByIdAsync(id);
+            var customer = await _customerService.GetCustomerAsync(id);
             if (customer == null)
             {
                 return NotFound();
             }
-            return Ok(customer.ToCustomerDto());
+            return Ok(customer);
         }
 
         [HttpGet("search/{email}")]
         public async Task<IActionResult> GetByEmail(string email)
         {
-            var customer = await _repository.GetByEmailAsync(email);
+            var customer = await _customerService.GetCustomerByEmailAsync(email);
             if (customer == null)
             {
                 return NotFound();
@@ -51,47 +49,45 @@ namespace ECommerce.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CustomerDto customerDto)
         {
-            var customer = customerDto.ToCustomer();
-            await _repository.CreateAsync(customer);
-            return Ok(customer.ToCustomerDto());
+            var customer = await _customerService.CreateCustomerAsync(customerDto);
+            return Ok(customer);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, CustomerDto customerDto)
         {
-            var existingCustomer = await _repository.GetByIdAsync(id);
-            if (existingCustomer == null)
+            var customer = await _customerService.UpdateCustomerAsync(id, customerDto);
+            if (customer == null)
             {
                 return NotFound();
             }
-            existingCustomer.UpdateCustomer(customerDto);
-            await _repository.UpdateAsync(id, existingCustomer);
-            return Ok(existingCustomer.ToCustomerDto());
+            return Ok(customer);
         }
 
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateStatus(string id, [FromBody] CustomerDto customerDto)
         {
-            var existingCustomer = await _repository.GetByIdAsync(id);
-            if (existingCustomer == null)
+            var customer = await _customerService.UpdateCustomerAsync(id, customerDto);
+            if (customer == null)
             {
-                return NotFound("Customer not found");
+                return NotFound();
             }
-            existingCustomer.UpdateCustomer(customerDto);
-            await _repository.UpdateAsync(id, existingCustomer);
-            return Ok(existingCustomer.ToCustomerDto());
+            return Ok(customer);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            var customer = await _repository.GetByIdAsync(id);
+            var customer = await _customerService.GetCustomerAsync(id);
             if (customer == null)
             {
-                return NotFound("Customer not found");
+                return NotFound();
             }
-
-            await _repository.DeleteAsync(id);
+            var result = await _customerService.DeleteCustomerAsync(id);
+            if (!result)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Success = false, Message = $"Error deleting customer '{customer.FirstName} {customer.LastName}'" });
+            }
             return Ok(new {Success = true, Message = $"Customer '{customer.FirstName} {customer.LastName}' successfully deleted" });
         }
     }

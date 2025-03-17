@@ -1,10 +1,11 @@
-﻿using ECommerce.Api.Entities;
+﻿using ECommerce.Api.Dtos;
+using ECommerce.Api.Entities;
 
 namespace ECommerce.Api.Repository
 {
     public interface IProductRepository : IRepository<Product>
     {
-        Task<Product> GetProductByName(string name);
-        Task<Product> GetProductByProductNumber(string productNumber);
+        Task<Product> GetProductByNameAsync(string name);
+        Task<Product> GetProductByProductNumberAsync(string productNumber);
     }
 }
