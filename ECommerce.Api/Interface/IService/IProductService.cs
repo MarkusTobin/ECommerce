@@ -1,7 +1,7 @@
 ﻿using ECommerce.Api.Dtos;
 using ECommerce.Api.Entities;
 
-namespace ECommerce.Api.Services
+namespace ECommerce.Api.Interface.IService
 {
     public interface IProductService
     {

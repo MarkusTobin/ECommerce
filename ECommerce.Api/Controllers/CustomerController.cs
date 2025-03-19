@@ -1,8 +1,8 @@
 ﻿using ECommerce.Api.Dtos;
 using ECommerce.Api.Entities;
+using ECommerce.Api.Interface.IService;
 using ECommerce.Api.Mapper;
 using ECommerce.Api.Repository;
-using ECommerce.Api.Services;
 using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

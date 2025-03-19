@@ -1,6 +1,6 @@
 ﻿using ECommerce.Api.Dtos;
 using ECommerce.Api.Entities;
-using ECommerce.Api.Services;
+using ECommerce.Api.Interface.IService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

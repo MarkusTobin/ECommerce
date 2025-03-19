@@ -1,4 +1,5 @@
 ﻿using ECommerce.Api.Entities;
+using ECommerce.Api.Interface.IRepository;
 using ECommerce.Api.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;

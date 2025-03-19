@@ -1,11 +1,13 @@
 ﻿using ECommerce.Api.Dtos;
+using ECommerce.Api.Interface.IRepository;
+using ECommerce.Api.Interface.IService;
 using ECommerce.Api.Mapper;
 namespace ECommerce.Api.Services
 {
     public class CustomerService : ICustomerService
     {
-        private readonly Repository.ICustomerRepository _customerRepository;
-        public CustomerService(Repository.ICustomerRepository customerRepository) => _customerRepository = customerRepository;
+        private readonly ICustomerRepository _customerRepository;
+        public CustomerService(ICustomerRepository customerRepository) => _customerRepository = customerRepository;
         public async Task<IEnumerable<CustomerDto>> GetCustomersAsync()
         {
             var customers = await _customerRepository.GetAllAsync();

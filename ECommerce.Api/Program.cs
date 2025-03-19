@@ -1,3 +1,5 @@
+using ECommerce.Api.Interface.IRepository;
+using ECommerce.Api.Interface.IService;
 using ECommerce.Api.Repository;
 using ECommerce.Api.Services;
 using ECommerce.Api.Settings;
@@ -14,10 +16,13 @@ builder.Services.Configure<MongoDBSettings>(
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
+builder.Services.AddScoped<OrderService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

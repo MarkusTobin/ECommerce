@@ -1,5 +1,6 @@
 ﻿using ECommerce.Api.Dtos;
-namespace ECommerce.Api.Services
+
+namespace ECommerce.Api.Interface.IService
 {
     public interface ICustomerService
     {

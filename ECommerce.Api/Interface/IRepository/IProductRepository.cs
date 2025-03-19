@@ -1,7 +1,7 @@
 ﻿using ECommerce.Api.Dtos;
 using ECommerce.Api.Entities;
 
-namespace ECommerce.Api.Repository
+namespace ECommerce.Api.Interface.IRepository
 {
     public interface IProductRepository : IRepository<Product>
     {

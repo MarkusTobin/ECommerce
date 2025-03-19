@@ -1,6 +1,6 @@
 ﻿using ECommerce.Api.Entities;
 
-namespace ECommerce.Api.Repository
+namespace ECommerce.Api.Interface.IRepository
 {
     public interface ICustomerRepository : IRepository<Customer>
     {

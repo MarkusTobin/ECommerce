@@ -1,18 +1,19 @@
-﻿using ECommerce.Api.Repository;
-using ECommerce.Api.Entities;
+﻿using ECommerce.Api.Entities;
 using ECommerce.Api.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using ECommerce.Api.Dtos;
 using ECommerce.Api.Mapper;
+using ECommerce.Api.Interface.IRepository;
+using ECommerce.Api.Interface.IService;
 
 namespace ECommerce.Api.Services
 {
     public class ProductService : IProductService
     {
-        private readonly Repository.IProductRepository _repository;
+        private readonly IProductRepository _repository;
 
-        public ProductService(Repository.IProductRepository repository) => _repository = repository;
+        public ProductService(IProductRepository repository) => _repository = repository;
 
         public async Task<IEnumerable<ProductDto>> GetProductsAsync()
         {
