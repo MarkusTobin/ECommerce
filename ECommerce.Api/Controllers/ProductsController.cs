@@ -1,8 +1,6 @@
 ﻿using ECommerce.Api.Dtos;
 using ECommerce.Api.Entities;
-using ECommerce.Api.Mapper;
-using ECommerce.Api.Repository;
-using Mapster;
+using ECommerce.Api.Interface.IService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,98 +10,87 @@ namespace ECommerce.Api.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly IProductRepository _repository;
-        public ProductsController(IProductRepository productRepository)
-        {
-            _repository = productRepository;
-        }
+        private readonly IProductService _productService;
+        public ProductsController(IProductService productService) => _productService = productService;
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var products = await _repository.GetAllAsync();
-            return Ok(products.ToProductDtos());
+            var products = await _productService.GetProductsAsync();
+            return Ok(products);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
-            var product = await _repository.GetByIdAsync(id);
+            var product = await _productService.GetProductAsync(id);
             if (product == null)
             {
                 return NotFound();
             }
-            return Ok(product.ToProductDto());
+            return Ok(product);
         }
 
         [HttpGet("search/name/{name}")]
         public async Task<IActionResult> GetByProductName(string name)
         {
-            var product = await _repository.GetProductByName(name);
+            var product = await _productService.GetProductByNameAsync(name);
             if (product == null)
             {
                 return NotFound();
             }
-            return Ok(product.ToProductDto());
+            return Ok(product);
         }
+
         [HttpGet("search/productNumber/{productNumber}")]
         public async Task<IActionResult> GetByProductNumber(string productNumber)
         {
-            var product = await _repository.GetProductByProductNumber(productNumber);
+            var product = await _productService.GetProductByProductNumberAsync(productNumber);
             if (product == null)
             {
                 return NotFound();
             }
-            return Ok(product.ToProductDto());
+            return Ok(product);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(ProductDto productDto)
         {
-            var product = productDto.ToProduct();
-            await _repository.CreateAsync(product);
-            return Ok(product.ToProductDto());
+            var product = await _productService.CreateProductAsync(productDto);
+            return Ok(product);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, ProductDto productDto)
         {
-            var existingProduct = await _repository.GetByIdAsync(id);
-            if (existingProduct == null)
+            var product = await _productService.UpdateProductAsync(id, productDto);
+            if (product == null)
             {
                 return NotFound();
             }
-            existingProduct.UpdateProduct(productDto);
-            await _repository.UpdateAsync(id, existingProduct);
-            return Ok(existingProduct.ToProductDto());
-
+            return Ok(product);
         }
 
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateStatus(string id, [FromBody] ProductDto productDto)
         {
-            var existingProduct = await _repository.GetByIdAsync(id);
-            if (existingProduct == null)
+            var product = await _productService.UpdateProductAsync(id, productDto);
+            if (product == null)
             {
                 return NotFound("Product not found");
             }
-            existingProduct.UpdateProduct(productDto);
-            await _repository.UpdateAsync(id, existingProduct);
-            return Ok(existingProduct.ToProductDto());
+            return Ok(product);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            var product = await _repository.GetByIdAsync(id);
-            if (product == null)
+            var success = await _productService.DeleteProductAsync(id);
+            if (!success)
             {
                 return NotFound("Product not found");
             }
-
-            await _repository.DeleteAsync(id);
-            return Ok(new { Success = true, Message = $"Product '{product.Name}' successfully deleted" });
+            return Ok(new { Success = true, Message = $"Product successfully deleted" });
         }
-
     }
 }
