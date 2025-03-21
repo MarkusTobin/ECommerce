@@ -7,10 +7,8 @@ namespace ECommerce.Api.DTOs
 {
     public class OrderDto
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
+
         public string? Id { get; set; }
-        [BsonRepresentation(BsonType.ObjectId)]
         public string? CustomerId { get; set; }
         public DateTime OrderDate { get; set; }
         public decimal TotalPrice { get; set; }
@@ -19,7 +17,6 @@ namespace ECommerce.Api.DTOs
 
     public class OrderDetailDto
     {
-        [BsonRepresentation(BsonType.ObjectId)]
         public string? ProductId { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }

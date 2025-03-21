@@ -13,21 +13,18 @@ namespace ECommerce.Api.Controllers
 {
     [Route("api/orders")]
     [ApiController]
-    public class OrdersController : ControllerBase
+    public class OrdersController(OrderService orderService) : ControllerBase
     {
-        private readonly OrderService _orderService;
-        public OrdersController(OrderService orderService) => _orderService = orderService;
-
         [HttpGet("customer/{customerId}")]
         public async Task<IActionResult> GetOrdersByCustomerId(string customerId)
         {
-            var orders = await _orderService.GetOrdersByCustomerIdAsync(customerId);
+            var orders = await orderService.GetOrdersByCustomerIdAsync(customerId);
             return Ok(orders);
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
-            var order = await _orderService.GetOrderAsync(id);
+            var order = await orderService.GetOrderAsync(id);
             if (order == null)
             {
                 return NotFound();
@@ -38,7 +35,7 @@ namespace ECommerce.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(OrderDto orderDto)
         {
-            var order = await _orderService.CreateOrderAsync(orderDto);
+            var order = await orderService.CreateOrderAsync(orderDto);
             return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
         }
 
