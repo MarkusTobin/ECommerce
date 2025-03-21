@@ -14,14 +14,14 @@ namespace ECommerce.Api.Repository
         {
         }
 
-        public override async Task CreateAsync(User user)
+        public override async Task CreateAsync(User user, IClientSessionHandle session = null)
         {
-            await base.CreateAsync(user);
+            await base.CreateAsync(user, session);
         }
 
-        public override async Task UpdateAsync(string id, User user)
+        public override async Task UpdateAsync(string id, User user, IClientSessionHandle session = null)
         {
-            await base.UpdateAsync(id, user);
+            await base.UpdateAsync(id, user, session);
         }
 
         public async Task<User> GetUserByUsernameAsync(string username)

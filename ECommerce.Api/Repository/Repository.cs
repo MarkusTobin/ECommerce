@@ -17,9 +17,12 @@ namespace ECommerce.Api.Repository
             _collection = database.GetCollection<T>(typeof(T).Name);
         }
 
-        public virtual async Task CreateAsync(T entity)
+        public virtual async Task CreateAsync(T entity, IClientSessionHandle session = null)
         {
-            await _collection.InsertOneAsync(entity);
+            if (session != null)
+                await _collection.InsertOneAsync(session, entity);
+            else
+                await _collection.InsertOneAsync(entity);
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
@@ -33,16 +36,26 @@ namespace ECommerce.Api.Repository
             return await _collection.Find(Builders<T>.Filter.Eq("_id", objectId)).FirstOrDefaultAsync();
         }
 
-        public virtual async Task UpdateAsync(string id, T entity)
+        public virtual async Task UpdateAsync(string id, T entity, IClientSessionHandle session = null)
         {
             var objectId = new ObjectId(id);
-            await _collection.ReplaceOneAsync(Builders<T>.Filter.Eq("_id", objectId), entity);
-        }
-        public async Task DeleteAsync(string id)
-        {
-            var objectId = new ObjectId(id);
+            var filter = Builders<T>.Filter.Eq("_id", objectId);
 
-            await _collection.DeleteOneAsync(Builders<T>.Filter.Eq("_id", objectId));
+            if (session != null)
+                await _collection.ReplaceOneAsync(session, filter, entity);
+            else
+                await _collection.ReplaceOneAsync(filter, entity);
+        }
+
+        public async Task DeleteAsync(string id, IClientSessionHandle session = null)
+        {
+            var objectId = new ObjectId(id);
+            var filter = Builders<T>.Filter.Eq("_id", objectId);
+
+            if (session != null)
+                await _collection.DeleteOneAsync(session, filter);
+            else
+                await _collection.DeleteOneAsync(filter);
         }
     }
 }

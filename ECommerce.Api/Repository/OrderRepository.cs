@@ -11,13 +11,13 @@ namespace ECommerce.Api.Repository
         public OrderRepository(IOptions<MongoDBSettings> settings) : base(settings)
         {
         }
-        public override async Task CreateAsync(Order order)
+        public override async Task CreateAsync(Order order, IClientSessionHandle session = null)
         {
-            await base.CreateAsync(order);
+            await base.CreateAsync(order, session);
         }
-        public override async Task UpdateAsync(string id, Order order)
+        public override async Task UpdateAsync(string id, Order order, IClientSessionHandle session = null)
         {
-            await base.UpdateAsync(id, order);
+            await base.UpdateAsync(id, order, session);
         }
         public async Task<IEnumerable<Order>> GetOrdersByCustomerIdAsync(string customerId)
         {

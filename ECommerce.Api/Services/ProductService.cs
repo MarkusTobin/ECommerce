@@ -6,58 +6,100 @@ using ECommerce.Api.Dtos;
 using ECommerce.Api.Mapper;
 using ECommerce.Api.Interface.IRepository;
 using ECommerce.Api.Interface.IService;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ECommerce.Api.Services
 {
     public class ProductService : IProductService
     {
-        private readonly IProductRepository _repository;
-
-        public ProductService(IProductRepository repository) => _repository = repository;
+        private readonly IUnitOfWork _unitOfWork;
+        public ProductService(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
         public async Task<IEnumerable<ProductDto>> GetProductsAsync()
         {
-            var products = await _repository.GetAllAsync();
+            var products = await _unitOfWork.Products.GetAllAsync();
             return products.ToProductDtos();
         }
 
         public async Task<ProductDto> GetProductAsync(string id)
         {
-            var product = await _repository.GetByIdAsync(id);
+            var product = await _unitOfWork.Products.GetByIdAsync(id);
             return product == null ? throw new Exception("Product not found") : product.ToProductDto();
         }
 
         public async Task<ProductDto> CreateProductAsync(ProductDto productDto)
         {
             var product = productDto.ToProduct();
-            await _repository.CreateAsync(product);
+
+            using (_unitOfWork)
+            {
+                await _unitOfWork.StartSessionAsync();
+                try
+                {
+                    await _unitOfWork.Products.CreateAsync(product, _unitOfWork.Session);
+                    await _unitOfWork.CommitTransactionAsync();
+                }
+                catch
+                {
+                    await _unitOfWork.RollbackAsync();
+                    throw;
+                }
+            }
+
             return product.ToProductDto();
         }
 
         public async Task<ProductDto> UpdateProductAsync(string id, ProductDto productDto)
         {
-            var product = await _repository.GetByIdAsync(id) ?? throw new Exception("Product not found");
-            product.UpdateProduct(productDto);
-            await _repository.UpdateAsync(id, product);
-            return product.ToProductDto();
+            using (_unitOfWork)
+            {
+                await _unitOfWork.StartSessionAsync();
+                try
+                {
+                    var product = await _unitOfWork.Products.GetByIdAsync(id) ?? throw new Exception("Product not found");
+                    product.UpdateProduct(productDto);
+                    await _unitOfWork.Products.UpdateAsync(id, product, _unitOfWork.Session);
+                    await _unitOfWork.CommitTransactionAsync();
+                }
+                catch
+                {
+                    await _unitOfWork.RollbackAsync();
+                    throw;
+                }
+            }
+
+            return productDto;
         }
 
         public async Task<bool> DeleteProductAsync(string id)
         {
-            var product = await _repository.GetByIdAsync(id) ?? throw new Exception("Product not found");
-            await _repository.DeleteAsync(id);
-            return true;
+            using (_unitOfWork)
+            {
+                await _unitOfWork.StartSessionAsync();
+                try
+                {
+                    var product = await _unitOfWork.Products.GetByIdAsync(id) ?? throw new Exception("Product not found");
+                    await _unitOfWork.Products.DeleteAsync(id, _unitOfWork.Session);
+                    await _unitOfWork.CommitTransactionAsync();
+                    return true;
+                }
+                catch
+                {
+                    await _unitOfWork.RollbackAsync();
+                    throw;
+                }
+            }
         }
 
         public async Task<ProductDto> GetProductByNameAsync(string name)
         {
-            var product = await _repository.GetProductByNameAsync(name);
+            var product = await _unitOfWork.Products.GetProductByNameAsync(name);
             return product.ToProductDto();
         }
 
         public async Task<ProductDto> GetProductByProductNumberAsync(string productNumber)
         {
-            var product = await _repository.GetProductByProductNumberAsync(productNumber);
+            var product = await _unitOfWork.Products.GetProductByProductNumberAsync(productNumber);
             return product.ToProductDto();
         }
     }
