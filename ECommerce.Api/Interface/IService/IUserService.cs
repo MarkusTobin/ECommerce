@@ -1,4 +1,4 @@
-﻿using ECommerce.Api.Dtos;
+﻿using ECommerce.Shared.Dtos;
 using ECommerce.Api.Entities;
 namespace ECommerce.Api.Interface.IService
 {
@@ -9,6 +9,5 @@ namespace ECommerce.Api.Interface.IService
         Task<bool> CreateUserAsync(UserRegisterDto userRegisterDto);
         Task<bool> UpdateUserAsync(string id, UserDto userDto);
         Task<bool> DeleteUserAsync(string id);
-        Task<User?> LoginAsync(UserLoginDto userLoginDto);
     }
 }

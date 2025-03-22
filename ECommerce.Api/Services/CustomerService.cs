@@ -1,4 +1,4 @@
-﻿using ECommerce.Api.Dtos;
+﻿using ECommerce.Shared.Dtos;
 using ECommerce.Api.Interface.IRepository;
 using ECommerce.Api.Interface.IService;
 using ECommerce.Api.Mapper;

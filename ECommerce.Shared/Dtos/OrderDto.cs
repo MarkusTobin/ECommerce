@@ -1,9 +1,4 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson;
-using System;
-using System.Collections.Generic;
-
-namespace ECommerce.Api.DTOs
+﻿namespace ECommerce.Shared.Dtos
 {
     public class OrderDto
     {

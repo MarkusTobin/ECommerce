@@ -2,7 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using ECommerce.Api.Dtos;
+using ECommerce.Shared.Dtos;
 using ECommerce.Api.Interface.IRepository;
 using ECommerce.Api.Interface.IService;
 using ECommerce.Api.Mapper;
@@ -23,8 +23,19 @@ namespace ECommerce.Api.Services
             _jwtSettings = jwtSettings.Value;
             _userRepository = userRepository;
             _passwordHashingService = passwordHashingService;
-            //ta bort
-            Console.WriteLine("Secret Key: " + _jwtSettings.Key);
+        }
+
+        public async Task<User> LoginAsync(UserLoginDto userLoginDto)
+        {
+            var user = await _userRepository.GetUserByUsernameAsync(userLoginDto.Username);
+            if (user == null) return null;
+
+
+            if (!_passwordHashingService.VerifyPassword(userLoginDto.Password, user.PasswordHash))
+            {
+                return null;
+            }
+            return user;
         }
 
         public async Task<string> GenerateJwtToken(string username, string password)
@@ -38,7 +49,7 @@ namespace ECommerce.Api.Services
 
             if (string.IsNullOrEmpty(_jwtSettings.Key))
             {
-                throw new ArgumentNullException(nameof(_jwtSettings.Key), "SecretKey cannot be null or empty.");
+                throw new ArgumentNullException(nameof(_jwtSettings.Key), "Key cannot be null or empty.");
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();

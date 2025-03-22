@@ -2,11 +2,11 @@
 using ECommerce.Api.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using ECommerce.Api.Dtos;
+using ECommerce.Shared.Dtos;
 using ECommerce.Api.Mapper;
 using ECommerce.Api.Interface.IRepository;
 using ECommerce.Api.Interface.IService;
-using ECommerce.Api.DTOs;
+
 
 namespace ECommerce.Api.Services
 {

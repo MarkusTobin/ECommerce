@@ -1,4 +1,4 @@
-﻿using ECommerce.Api.Dtos;
+﻿using ECommerce.Shared.Dtos;
 
 namespace ECommerce.Api.Interface.IService
 {

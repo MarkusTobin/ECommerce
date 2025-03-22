@@ -2,7 +2,7 @@
 using ECommerce.Api.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using ECommerce.Api.Dtos;
+using ECommerce.Shared.Dtos;
 using ECommerce.Api.Mapper;
 using ECommerce.Api.Interface.IRepository;
 using ECommerce.Api.Interface.IService;
@@ -68,19 +68,5 @@ namespace ECommerce.Api.Services
             if (user == null) return null;
             return user;
         }
-
-        public async Task<User> LoginAsync(UserLoginDto userLoginDto)
-        {
-            var user = await repository.GetUserByUsernameAsync(userLoginDto.Username);
-            if (user == null) return null; 
-   
-
-            if (!passwordHashingService.VerifyPassword(userLoginDto.Password, user.PasswordHash))
-            {
-                return null; 
-            }
-            return user;
-        }
-
     }
 }

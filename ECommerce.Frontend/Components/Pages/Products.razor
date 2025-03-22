@@ -1,0 +1,49 @@
+﻿@page "/products"
+@using ECommerce.Frontend.Services
+@using ECommerce.Shared.Dtos
+@using Microsoft.AspNetCore.Components.Authorization
+@inject ProductService ProductService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Product List</PageTitle>
+
+<h3>Products</h3>
+
+@if (isAuthenticated)
+{
+    <p>Hello user</p>
+}
+@if (products == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (products.Count == 0)
+{
+    <p>No products found.</p>
+}
+else
+{
+    <ul>
+        @foreach (var product in products)
+        {
+            <li>@product.Name - @product.Price</li>
+        }
+    </ul>
+}
+
+@code {
+
+    private List<ProductDto> products;
+    private bool isAuthenticated;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch products from the API
+        products = await ProductService.GetAllProductsAsync();
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity.IsAuthenticated;
+    }
+
+
+}

@@ -1,7 +1,4 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson;
-
-namespace ECommerce.Api.Dtos
+﻿namespace ECommerce.Shared.Dtos
 {
     public class UserDto
     {

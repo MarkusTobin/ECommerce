@@ -1,4 +1,4 @@
-﻿namespace ECommerce.Api.Dtos
+﻿namespace ECommerce.Shared.Dtos
 {
     public class ProductDto
     {

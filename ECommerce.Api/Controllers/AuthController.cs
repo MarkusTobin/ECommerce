@@ -1,7 +1,7 @@
 ﻿using ECommerce.Api.Interface.IService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.Data;
-using ECommerce.Api.Dtos;
+using ECommerce.Shared.Dtos;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

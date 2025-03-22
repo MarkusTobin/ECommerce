@@ -3,7 +3,6 @@ using ECommerce.Api.Interface.IRepository;
 using ECommerce.Api.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using System.Security.Cryptography.X509Certificates;
 
 namespace ECommerce.Api.Repository
 {
