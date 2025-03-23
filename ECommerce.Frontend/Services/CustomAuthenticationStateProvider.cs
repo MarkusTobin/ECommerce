@@ -19,10 +19,6 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        if (!_isInitialized)
-        {
-            return new AuthenticationState(_anonymous);
-        }
 
         var token = await _localStorage.GetItemAsync<string>(_authToken);
 
@@ -56,14 +52,14 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
         var claims = ParseClaimsFromJwt(token);
         var authenticatedUser = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwtAuthType"));
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(authenticatedUser)));
-        Console.WriteLine("User logged in."); // Debug message
+
+        var roleClaim = claims.FirstOrDefault(c => c.Type == "role")?.Value;
     }
 
     public async Task NotifyUserLogout()
     {
         await _localStorage.RemoveItemAsync(_authToken); // Remove token on logout
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_anonymous)));
-        Console.WriteLine("User logged out."); // Debug message
     }
 
     private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)

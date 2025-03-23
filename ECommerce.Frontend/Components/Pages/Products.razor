@@ -4,12 +4,18 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inject ProductService ProductService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@rendermode InteractiveServer
 
 <PageTitle>Product List</PageTitle>
 
 <h3>Products</h3>
 
-@if (isAuthenticated)
+
+@if (userRole == "Admin")
+{
+    <p>Hello admin</p>
+}
+@if (userRole == "User")
 {
     <p>Hello user</p>
 }
@@ -34,16 +40,14 @@ else
 @code {
 
     private List<ProductDto> products;
-    private bool isAuthenticated;
+    private string? userRole;
 
     protected override async Task OnInitializedAsync()
     {
-        // Fetch products from the API
         products = await ProductService.GetAllProductsAsync();
 
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        isAuthenticated = authState.User.Identity.IsAuthenticated;
+        var user = authState.User;
+        userRole = user.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
     }
-
-
 }

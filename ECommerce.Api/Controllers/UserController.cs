@@ -12,7 +12,6 @@ namespace ECommerce.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
     public class UserController(IUserService userService) : ControllerBase
     {
         [HttpPost("register")]

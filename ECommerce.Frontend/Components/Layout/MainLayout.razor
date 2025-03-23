@@ -15,6 +15,7 @@
         <div class="top-row px-4">
             @if (isAuthenticated)
             {
+                <span>Hello, @username</span>
                 <button class="btn btn-link" @onclick="Logout">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
@@ -41,6 +42,7 @@
 
 @code {
     private bool isAuthenticated;
+    private string? username;
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,7 +55,9 @@
         {
             await AuthService.InitializeAsync();
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            isAuthenticated = authState.User.Identity.IsAuthenticated;
+            var user = authState.User;
+            isAuthenticated = user.Identity.IsAuthenticated;
+            username = user.FindFirst("unique_name")?.Value;
             StateHasChanged();
         }
     }
@@ -73,7 +77,10 @@
     private void OnAuthenticationStateChanged(Task<AuthenticationState> task)
     {
         var authState = task.Result;
-        isAuthenticated = authState.User.Identity.IsAuthenticated;
+        var user = authState.User;
+        isAuthenticated = user.Identity.IsAuthenticated;
+        username = user.FindFirst("unique_name")?.Value;
+
         StateHasChanged();
     }
 

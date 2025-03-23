@@ -1,0 +1,93 @@
+﻿@page "/register"
+@using ECommerce.Shared.Dtos
+@using ECommerce.Frontend.Services
+@inject UserService UserService
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Register</PageTitle>
+
+<div class="register-container">
+    <h3>Register</h3>
+    <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" class="form-control" @bind="username" />
+    </div>
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" class="form-control" @bind="password" />
+    </div>
+    <div class="form-group">
+        <label for="confirmPassword">Confirm Password:</label>
+        <input type="password" id="confirmPassword" class="form-control" @bind="confirmPassword" />
+    </div>
+    <div class="form-group">
+        <button class="btn btn-primary" @onclick="Register">Register</button>
+    </div>
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger mt-3">
+            @errorMessage
+        </div>
+    }
+</div>
+
+@code {
+    private string username;
+    private string password;
+    private string confirmPassword;
+    private string errorMessage;
+
+    private async Task Register()
+    {
+        if (password != confirmPassword)
+        {
+            errorMessage = "Passwords do not match.";
+            return;
+        }
+
+        var registerDto = new UserRegisterDto
+            {
+                Username = username,
+                Password = password,
+                Role = "User"
+
+                
+            };
+
+        try
+        {
+            var isSuccess = await UserService.RegisterUserAsync(registerDto);
+
+            if (isSuccess)
+            {
+                var loginDto = new UserLoginDto
+                    {
+                        Username = username,
+                        Password = password
+                    };
+
+                var loginSuccess = await AuthService.LoginAsync(loginDto);
+
+                if (loginSuccess)
+                {
+                    Navigation.NavigateTo("/products");
+                }
+                else
+                {
+                    errorMessage = "Registration successful, but login failed.";
+                }
+            }
+            else
+            {
+                errorMessage = "Registration failed or an error occurred.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+
+    }
+}
