@@ -10,7 +10,6 @@
 
 <h3>Products</h3>
 
-
 @if (userRole == "Admin")
 {
     <p>Hello admin</p>
@@ -38,16 +37,29 @@ else
 }
 
 @code {
-
     private List<ProductDto> products;
     private string? userRole;
 
     protected override async Task OnInitializedAsync()
     {
         products = await ProductService.GetAllProductsAsync();
+    }
 
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        userRole = user.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                var user = authState.User;
+                userRole = user.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
+                StateHasChanged();
+            }
+            catch (JSDisconnectedException)
+            {
+                
+            }
+        }
     }
 }
