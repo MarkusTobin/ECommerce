@@ -2,12 +2,21 @@
 @using ECommerce.Frontend.Services
 @using ECommerce.Shared.Dtos
 @using Microsoft.AspNetCore.Components.Authorization
+@using ECommerce.Frontend.Models
+@using MudBlazor
+@using MudBlazor.Services
 @inject ProductService ProductService
+@inject CartService CartService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
 <PageTitle>Product List</PageTitle>
-
+<MudAutocomplete T="string" Label="Search" Placeholder="Find products.." SearchFunc="SearchProducts">
+    <ItemTemplate>
+        @((MarkupString)context)
+    </ItemTemplate>
+</MudAutocomplete>
 <h3>Products</h3>
 
 @if (userRole == "Admin")
@@ -18,6 +27,7 @@
 {
     <p>Hello user</p>
 }
+
 @if (products == null)
 {
     <p><em>Loading...</em></p>
@@ -28,17 +38,38 @@ else if (products.Count == 0)
 }
 else
 {
-    <ul>
-        @foreach (var product in products)
+    <MudGrid>
+        @foreach (var product in products.Where(p => p.IsAvailable))
         {
-            <li>@product.Name - @product.Price</li>
+            <MudItem xs="12" sm="6" md="4">
+                <MudCard>
+                    <MudCardContent>
+                        <MudLink Href="@($"/products/name/{product.Name}")">
+                            <MudText Typo="Typo.h6">@product.Name</MudText>
+                        </MudLink>                        <MudText Typo="Typo.body2">@product.Price.ToString("C")</MudText>
+
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => CartService.AddToCart(product)">
+                            Add to Cart
+                        </MudButton>
+
+                        @if (userRole == "Admin")
+                        {
+                            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="() => MarkAsUnavailable(product)">
+                                Mark as Unavailable
+                            </MudButton>
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
         }
-    </ul>
+    </MudGrid>
 }
 
 @code {
     private List<ProductDto> products;
     private string? userRole;
+    private List<ProductDto> cart = new List<ProductDto>();
+    private ProductDto? selectedProduct;
 
     protected override async Task OnInitializedAsync()
     {
@@ -58,8 +89,36 @@ else
             }
             catch (JSDisconnectedException)
             {
-                
             }
         }
+    }
+
+    private async Task<IEnumerable<string>> SearchProducts(string name, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return new List<string>();
+
+        return products?
+            .Where(p => p != null &&
+                        (p.Name != null && p.Name.Contains(name, StringComparison.OrdinalIgnoreCase) ||
+                         p.ProductNumber != null && p.ProductNumber.Contains(name, StringComparison.OrdinalIgnoreCase)))
+            .Select(p => $"<a href=\"/products/name/{p.Name}\">{p.Name} ({p.ProductNumber})</a>")
+            .ToList() ?? new List<string>();
+    }
+
+
+    private void AddToCart(ProductDto product)
+    {
+        cart.Add(product);
+    }
+
+    private void MarkAsUnavailable(ProductDto product)
+    {
+        product.IsAvailable = false;
+        StateHasChanged();
+    }
+    private void NavigateToProduct(string productName)
+    {
+        NavigationManager.NavigateTo($"/products/name/{productName}");
     }
 }

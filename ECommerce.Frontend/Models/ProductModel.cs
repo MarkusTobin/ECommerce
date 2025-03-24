@@ -1,6 +1,6 @@
-﻿namespace ECommerce.Shared.Dtos
+﻿namespace ECommerce.Frontend.Models
 {
-    public class ProductDto
+    public class ProductModel
     {
         public string? Id { get; set; }
         public string? Name { get; set; }
@@ -10,6 +10,5 @@
         public string? ProductCategory { get; set; }
         public int Quantity { get; set; }
         public bool IsAvailable { get; set; }
-
     }
 }
