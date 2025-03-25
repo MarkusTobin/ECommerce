@@ -1,1 +1,23 @@
 ﻿@page "/admin"
+@using System.Collections.Generic
+@using ECommerce.Frontend.Components.PagesComponents.AdminPageComponents
+@using MudBlazor
+@using MudBlazor.Services
+
+<MudLayout>
+        <MudMainContent>
+            <MudContainer>
+                <MudTabs>
+                    <MudTabPanel Text="Customers">
+                        <CustomerList />
+                    </MudTabPanel>
+                    <MudTabPanel Text="Orders">
+                        <OrderTable />
+                    </MudTabPanel>
+                    <MudTabPanel Text="Manage Products">
+                        <ProductManager />
+                    </MudTabPanel>
+                </MudTabs>
+            </MudContainer>
+        </MudMainContent>
+</MudLayout>

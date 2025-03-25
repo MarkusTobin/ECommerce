@@ -17,6 +17,8 @@ builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<CustomerService>();
+
 //builder.Services.AddScoped<TokenService>();
 builder.Services.AddBlazoredLocalStorage();
 
@@ -35,6 +37,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddMudServices();
+
 
 var app = builder.Build();
 

@@ -63,6 +63,30 @@ else
             </MudItem>
         }
     </MudGrid>
+    @if (userRole == "Admin" && products.Any(p => !p.IsAvailable))
+    {
+        <div style="position: fixed; bottom: 0; width: 100%; background-color: white;">
+        <h3>[Admin] Unavailable Products</h3>
+        <MudGrid>
+            @foreach (var product in products.Where(p => !p.IsAvailable))
+            {
+                <MudItem xs="12" sm="6" md="4">
+                    <MudCard>
+                        <MudCardContent>
+                            <MudLink Href="@($"/products/name/{product.Name}")">
+                                <MudText Typo="Typo.h6">@product.Name</MudText>
+                            </MudLink>
+                            <MudText Typo="Typo.body2">@product.Price.ToString("C")</MudText>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => MarkAsAvailable(product)">
+                                Mark as Available
+                            </MudButton>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+        </div>
+    }
 }
 
 @code {
@@ -115,6 +139,11 @@ else
     private void MarkAsUnavailable(ProductDto product)
     {
         product.IsAvailable = false;
+        StateHasChanged();
+    }
+    private void MarkAsAvailable(ProductDto product)
+    {
+        product.IsAvailable = true;
         StateHasChanged();
     }
     private void NavigateToProduct(string productName)

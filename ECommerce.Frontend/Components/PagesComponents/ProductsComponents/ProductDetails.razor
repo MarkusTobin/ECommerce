@@ -26,9 +26,13 @@ else
         <p>Category: @product.ProductCategory</p>
         <p>Description: @product.ProductDescription</p>
         <p>Quantity available: @product.Quantity</p>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => CartService.AddToCart(product)">
+        <MudButton Variant="Variant.Filled" Disabled="@(!product.IsAvailable)" Color="Color.Primary" OnClick="() => CartService.AddToCart(product)">
             Add to Cart
         </MudButton>
+        @if (!product.IsAvailable)
+        {
+            <p>This product is not available at the moment.</p>
+        }
 
     </div>
 }

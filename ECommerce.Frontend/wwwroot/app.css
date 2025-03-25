@@ -51,15 +51,18 @@ h1:focus {
 }
 
 .mud-button {
-    background-color: #26b050; /* Customize background color */
-    color: white; /* Text color */
-    border-radius: 4px; /* Button corners */
+    background-color: #26b050;
+    color: white; 
+    border-radius: 4px;
 }
 
     .mud-button.mud-button-filled {
-        background-color: #03a9f4; /* Filled button color */
+        background-color: #03a9f4; 
     }
 
     .mud-button.mud-button-text {
-        color: #6200ea; /* Text button color */
+        color: #6200ea; 
     }
+.mud-table .mud-checkbox {
+    display: none;
+}

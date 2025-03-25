@@ -1,0 +1,68 @@
+﻿@inject CustomerService CustomerService
+@using ECommerce.Shared.Dtos
+@using MudBlazor
+@using MudBlazor.Services
+
+<MudCard>
+    <MudCardContent>
+        <MudTypography Variant="h5">Customers</MudTypography>
+
+        <MudTable Items="customers">
+            <HeaderContent>
+                <MudTh>First Name</MudTh>
+                <MudTh>Last Name</MudTh>
+                <MudTh>Email</MudTh>
+                <MudTh>Phone</MudTh>
+                <MudTh>Address</MudTh>
+                <MudTh>Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate Context="customer">
+                <MudTd>@customer.FirstName</MudTd>
+                <MudTd>@customer.LastName</MudTd>
+                <MudTd>@customer.Email</MudTd>
+                <MudTd>@customer.PhoneNumber</MudTd>
+                <MudTd>@customer.Address</MudTd>
+                <MudTd>
+                    <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" OnClick="() => EditCustomer(customer)" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => DeleteCustomer(customer.Id)" />
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    private List<CustomerDto> customers = new();
+    private CustomerDto editingCustomer = new();
+    private bool isDialogOpen = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCustomers();
+    }
+
+    private async Task LoadCustomers()
+    {
+        customers = await CustomerService.GetAllCustomersAsync();
+    }
+
+    private void EditCustomer(CustomerDto customer)
+    {
+        editingCustomer = new CustomerDto
+        {
+            Id = customer.Id,
+            FirstName = customer.FirstName,
+            LastName = customer.LastName,
+            Email = customer.Email,
+            PhoneNumber = customer.PhoneNumber,
+            Address = customer.Address
+        };
+        isDialogOpen = true;
+    }
+    private async Task DeleteCustomer(string id)
+    {
+
+        await CustomerService.DeleteCustomerAsync(id);
+        await LoadCustomers();
+    }
+}

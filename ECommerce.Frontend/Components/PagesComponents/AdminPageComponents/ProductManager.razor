@@ -1,0 +1,166 @@
+﻿@page "/admin/products"
+@inject ProductService ProductService
+@inject IDialogService DialogService
+@using ECommerce.Shared.Dtos
+@using MudBlazor
+@using MudBlazor.Services
+@using ECommerce.Frontend.Components.Dialogs
+
+<MudCard>
+    <MudCardContent>
+        <MudTypography Variant="h5">Products</MudTypography>
+        <MudTable Items="products" Dense Hover="true" @bind-SelectedItem="selectedProduct" @ref="mudTable" CommitEditIcon="" >
+            <HeaderContent>
+                <MudTh>Name</MudTh>
+                <MudTh>Product Number</MudTh>
+                <MudTh>Price</MudTh>
+                <MudTh>Category</MudTh>
+                <MudTh>Quantity</MudTh>
+                <MudTh>Description</MudTh>
+                <MudTh>Is Available</MudTh>
+                <MudTh>Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Name">@context.Name</MudTd>
+                <MudTd DataLabel="Product Number">@context.ProductNumber</MudTd>
+                <MudTd DataLabel="Price">@context.Price.ToString("C")</MudTd>
+                <MudTd DataLabel="Category">@context.ProductCategory</MudTd>
+                <MudTd DataLabel="Quantity">@context.Quantity</MudTd>
+                <MudTd DataLabel="Description">@context.ProductDescription</MudTd>
+                <MudTd DataLabel="Is Available">@context.IsAvailable</MudTd>
+                <MudTd>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => ConfirmDeleteProduct(context.Id)" />
+                </MudTd>
+            </RowTemplate>
+            <RowEditingTemplate>
+                <MudTd DataLabel="Name">
+                    <MudTextField @bind-Value="@context.Name" Required />
+                </MudTd>
+                <MudTd DataLabel="Product Number">
+                    <MudTextField @bind-Value="@context.ProductNumber" Required />
+                </MudTd>
+                <MudTd DataLabel="Price">
+                    <MudNumericField @bind-Value="@context.Price" Required />
+                </MudTd>
+                <MudTd DataLabel="Category">
+                    <MudTextField @bind-Value="@context.ProductCategory" Required />
+                </MudTd>
+                <MudTd DataLabel="Quantity">
+                    <MudNumericField @bind-Value="@context.Quantity" Required />
+                </MudTd>
+                <MudTd DataLabel="Description">
+                    <MudTextField @bind-Value="@context.ProductDescription" Required />
+                </MudTd>
+                <MudTd DataLabel="Is Available">
+                    <MudCheckBox T="bool" @bind-Checked="@context.IsAvailable" />
+                </MudTd>
+                <MudTd>
+                    <MudButton OnClick="@(() => SaveEditProduct(context))" Color="Color.Primary">Save</MudButton>
+                </MudTd>
+            </RowEditingTemplate>
+        </MudTable>
+    </MudCardContent>
+</MudCard>
+
+<MudCard>
+    <MudExpansionPanel Text="Add New Product">
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudTextField T="string" @bind-Value="newProduct.Name" Label="Name" Required="true" RequiredError="Name is required!" />
+            <MudTextField T="string" @bind-Value="newProduct.ProductNumber" Label="Product Number" Required="true" RequiredError="Product Number is required!" />
+            <MudNumericField T="decimal" @bind-Value="newProduct.Price" Label="Price" Required="true" RequiredError="Price is required!" />
+            <MudTextField T="string" @bind-Value="newProduct.ProductCategory" Label="Category" Required="true" RequiredError="Category is required!" />
+            <MudNumericField T="int" @bind-Value="newProduct.Quantity" Label="Quantity" Required="true" RequiredError="Quantity is required!" />
+            <MudTextField T="string" @bind-Value="newProduct.ProductDescription" Label="Description" Required="true" RequiredError="Description is required!" />
+            <MudSelect T="bool" @bind-Value="newProduct.IsAvailable" Label="Is Available" Required="true" RequiredError="Availability is required!">
+                <MudSelectItem Value="@true">True</MudSelectItem>
+                <MudSelectItem Value="@false">False</MudSelectItem>
+            </MudSelect>
+            <MudButton OnClick="ConfirmAddProduct" Color="Color.Primary" Disabled="@(!success)">Add Product</MudButton>
+        </MudForm>
+    </MudExpansionPanel>
+</MudCard>
+
+@code {
+    private List<ProductDto> products = new();
+    private ProductDto newProduct = new();
+    private ProductDto selectedProduct;
+    private MudTable<ProductDto> mudTable;
+    private bool success;
+    private string[] errors = { };
+    private MudForm form;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        products = await ProductService.GetAllProductsAsync();
+    }
+
+    private async Task SaveEditProduct(ProductDto product)
+    {
+        await ProductService.UpdateProductAsync(product.Id, product);
+        await LoadProducts();
+        mudTable.SetEditingItem(null);
+
+    }
+
+    private async Task ConfirmAddProduct()
+    {
+        await form.Validate();
+        if (form.IsValid)
+        {
+            var parameters = new DialogParameters
+        {
+            { "ContentText", "Are you sure you want to add this product?" },
+            { "ButtonText", "Add" },
+            { "Color", Color.Primary }
+        };
+
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+
+            var dialog = DialogService.Show<ConfirmDialog>("Add Product", parameters, options);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                await AddProduct();
+            }
+        }
+    }
+
+    private async Task AddProduct()
+    {
+        await ProductService.CreateProductAsync(newProduct);
+        newProduct = new ProductDto();
+        await LoadProducts();
+    }
+
+    private async Task ConfirmDeleteProduct(string id)
+    {
+        var parameters = new DialogParameters
+        {
+            { "ContentText", "Are you sure you want to delete this product?" },
+            { "ButtonText", "Delete" },
+            { "Color", Color.Error }
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+
+        var dialog = DialogService.Show<ConfirmDialog>("Delete Product", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await DeleteProduct(id);
+        }
+    }
+
+    private async Task DeleteProduct(string id)
+    {
+        await ProductService.DeleteProductAsync(id);
+        await LoadProducts();
+    }
+}
