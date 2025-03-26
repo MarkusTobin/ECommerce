@@ -1,0 +1,117 @@
+﻿@page "/orderconfirmation"
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@using ECommerce.Shared.Dtos
+@inject NavigationManager NavigationManager
+@inject CartService CartService
+@inject CustomerService CustomerService
+@inject OrderService OrderService
+
+
+<MudGrid>
+    <MudItem xs="12" sm="7">
+        <MudPaper Class="pa-4">
+            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                <MudTextField T="string" @bind-Value="customer.FirstName" Label="First Name" Required="true" RequiredError="First name is required!" />
+                <MudTextField T="string" @bind-Value="customer.LastName" Label="Last Name" Required="true" RequiredError="Last name is required!" />
+                <MudTextField T="string" @bind-Value="customer.Email" Label="Email" Required="true" RequiredError="Email is required!"/>
+                <MudTextField T="string" @bind-Value="customer.PhoneNumber" Label="Phone Number" RequiredError="Phone number is required"/>
+                <MudTextField T="string" @bind-Value="customer.Address" Label="Address" RequiredError="Adress is required"/>
+                <div class="d-flex align-center justify-space-between">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" OnClick="SubmitOrder">Submit Order</MudButton>
+                </div>
+            </MudForm>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="5">
+        <MudPaper Class="pa-4 mud-height-full">
+            <MudText Typo="Typo.subtitle2">@($"Errors ({errors.Length})")</MudText>
+            @foreach (var error in errors)
+            {
+                <MudText Color="@Color.Error">@error</MudText>
+            }
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    bool success;
+    string[] errors = { };
+    MudForm form;
+    private CustomerDto customer = new CustomerDto();
+    private string errorMessage;
+
+    private async Task SubmitOrder()
+    {
+        await form.Validate();
+        if (success)
+        {
+            Console.WriteLine("Form validation successful.");
+            var existingCustomer = await CustomerService.GetCustomerByEmailAsync(customer.Email);
+            CustomerDto customerToUse;
+
+            if (existingCustomer != null && existingCustomer.FirstName == customer.FirstName && existingCustomer.LastName == customer.LastName)
+            {
+                Console.WriteLine($"Customer with email {customer.Email} found with ID: {existingCustomer.Id}");
+                customerToUse = existingCustomer;
+            }
+            else if (existingCustomer != null)
+            {
+                errorMessage = "A customer with this email already exists but the name does not match. Please check your details.";
+                Console.WriteLine("Customer email exists but name does not match.");
+                return;
+            }
+            else
+            {
+                var createdCustomer = await CustomerService.CreateCustomerAsync(customer);
+                if (createdCustomer != null && !string.IsNullOrEmpty(createdCustomer.Id))
+                {
+                    Console.WriteLine($"Customer created with ID: {createdCustomer.Id}");
+                    customerToUse = createdCustomer;
+                }
+                else
+                {
+                    errorMessage = "Customer creation failed. Please try again later.";
+                    Console.WriteLine("Customer creation failed.");
+                    return;
+                }
+            }
+
+            var orderDetails = CartService.CartItems.Select(item => new OrderDetailDto
+                {
+                    ProductId = item.Product.Id,
+                    ProductName = item.Product.Name,
+                    Quantity = item.Quantity,
+                    UnitPrice = item.Product.Price
+                }).ToList();
+
+            var order = new OrderDto
+                {
+                    CustomerId = customerToUse.Id,
+                    CustomerFullName = $"{customerToUse.FirstName} {customerToUse.LastName}",
+                    OrderDate = DateTime.Now,
+                    TotalPrice = CartService.GetTotalPrice(),
+                    OrderDetails = orderDetails
+                };
+
+            var createdOrder = await OrderService.CreateOrderAsync(order);
+            if (createdOrder != null)
+            {
+                Console.WriteLine($"Order created with ID: {createdOrder.Id}");
+                CartService.ClearCart();
+                Console.WriteLine("Cart cleared.");
+                NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                errorMessage = "Order creation failed. Please try again later.";
+                Console.WriteLine("Order creation failed.");
+            }
+        }
+        else
+        {
+            errorMessage = "Form validation failed. Please check the form and try again.";
+            Console.WriteLine("Form validation failed.");
+        }
+    }
+}

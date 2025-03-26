@@ -1,0 +1,52 @@
+﻿@page "/checkout"
+@using ECommerce.Frontend.Services
+@using ECommerce.Shared.Dtos
+@using Microsoft.AspNetCore.Components.Authorization
+@inject CartService CartService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Checkout</PageTitle>
+
+<h3>Your Cart</h3>
+
+@if (cartItems.Count == 0)
+{
+    <p>Your cart is empty.</p>
+}
+else
+{
+    <MudTable Items="cartItems" Hover="true">
+        <HeaderContent>
+            <MudTh>Product</MudTh>
+            <MudTh>Price</MudTh>
+            <MudTh>Quantity</MudTh>
+            <MudTh>Total</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Product">@context.Product.Name</MudTd>
+            <MudTd DataLabel="Price">@context.Product.Price.ToString("C")</MudTd>
+            <MudTd DataLabel="Quantity">@context.Quantity</MudTd>
+            <MudTd DataLabel="Total">@string.Format("{0:C}", @context.Product.Price * @context.Quantity)</MudTd>
+        </RowTemplate>
+    </MudTable>
+
+    <MudText Typo="Typo.h6">Total Price: @CartService.GetTotalPrice().ToString("C")</MudText>
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="FillOutInformation">
+        Fill out information
+    </MudButton>
+}
+
+@code {
+    private List<CartItem> cartItems;
+
+    protected override void OnInitialized()
+    {
+        cartItems = CartService.GetCart();
+    }
+
+    private void FillOutInformation()
+    {
+        NavigationManager.NavigateTo("/orderconfirmation");
+    }
+}

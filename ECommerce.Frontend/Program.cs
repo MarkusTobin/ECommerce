@@ -18,6 +18,8 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<CustomerService>();
+builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<OrderService>();
 
 //builder.Services.AddScoped<TokenService>();
 builder.Services.AddBlazoredLocalStorage();
@@ -29,9 +31,9 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.Authority = "https://localhost:7150"; // Replace with your authentication server
-    options.Audience = "https://localhost:7074"; // Replace with the expected API audience
-    options.RequireHttpsMetadata = false; // Set to true in production
+    options.Authority = "https://localhost:7150";
+    options.Audience = "https://localhost:7074"; 
+    //options.RequireHttpsMetadata = true;  remove this line later on
 });
 
 builder.Services.AddAuthorization();

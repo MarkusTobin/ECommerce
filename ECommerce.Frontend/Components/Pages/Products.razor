@@ -48,7 +48,7 @@ else
                             <MudText Typo="Typo.h6">@product.Name</MudText>
                         </MudLink>                        <MudText Typo="Typo.body2">@product.Price.ToString("C")</MudText>
 
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => CartService.AddToCart(product)">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => AddToCart(product, 1)">
                             Add to Cart
                         </MudButton>
 
@@ -77,6 +77,8 @@ else
                                 <MudText Typo="Typo.h6">@product.Name</MudText>
                             </MudLink>
                             <MudText Typo="Typo.body2">@product.Price.ToString("C")</MudText>
+                                <MudNumericField T="int" Label="Quantity" @bind-Value="product.Quantity" Min="1" />
+
                             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => MarkAsAvailable(product)">
                                 Mark as Available
                             </MudButton>
@@ -131,9 +133,12 @@ else
     }
 
 
-    private void AddToCart(ProductDto product)
+    private void AddToCart(ProductDto product, int quantity)
     {
-        cart.Add(product);
+        if (quantity > 0)
+        {
+            CartService.AddToCart(product, quantity);
+        }
     }
 
     private void MarkAsUnavailable(ProductDto product)

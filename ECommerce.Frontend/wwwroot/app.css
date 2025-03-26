@@ -66,3 +66,35 @@ h1:focus {
 .mud-table .mud-checkbox {
     display: none;
 }
+.cart-icon-container {
+    position: relative;
+    top: 0.5rem;
+    right: 0.5rem;
+
+}
+.cart-dropdown {
+    top: 50px;
+    width: 400px;
+    height: 300px;
+    overflow-y: auto;
+}
+
+.cart-dropdown {
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.cart-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.cart-item MudButton {
+    margin-top: 8px;
+}
+
+.cart-item MudText {
+    font-size: 14px;
+}

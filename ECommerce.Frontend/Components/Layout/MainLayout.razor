@@ -3,10 +3,12 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using MudBlazor
 @using MudBlazor.Services
+@using ECommerce.Frontend.Components.PagesComponents.CartComponents
 @inherits LayoutComponentBase
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject AuthService AuthService
+@inject CartService CartService
 
 
 <MudThemeProvider />
@@ -25,6 +27,7 @@
 
     <main>
         <div class="top-row px-4">
+            <CartIcon />
             @if (isAuthenticated)
             {
                 <span>Hello, @username</span>

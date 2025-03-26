@@ -1,0 +1,81 @@
+﻿@inject CartService CartService
+@inject NavigationManager NavigationManager
+@using MudBlazor
+
+<div class="cart-icon-container">
+    <MudBadge Content="@CartService.CartCount" Color="Color.Error" Overlap="true">
+        <MudIconButton Icon="@Icons.Material.Filled.ShoppingCart" Color="Color.Primary" OnClick="ToggleCartView" />
+    </MudBadge>
+    <div class="cartbox">
+    <MudPopover @bind-Open="isCartOpen">
+        <MudPaper Class="cart-dropdown" Elevation="4" Style="width: 300px; height:auto; padding: 16px;">
+            <MudText Typo="Typo.h6" Align="Align.Center" Class="mb-3"><strong>Cart Items</strong></MudText>
+
+            @foreach (var item in CartService.CartItems)
+            {
+                <MudDivider />
+                <div class="cart-item">
+                        <MudText Typo="Typo.body1"><strong>@item.Product.Name @item.Product.Price.ToString("C") </strong></MudText>
+                    <MudText Typo="Typo.body2">Quantity: @item.Quantity</MudText>
+                        <MudNumericField @bind-Value="item.Quantity" Min="1" Max="100" Immediate="true" OnBlur="() => UpdateCart(item)" />
+
+                        <MudText Typo="Typo.body2">Price: @(string.Format("{0:C}", item.Product.Price * item.Quantity))</MudText>
+
+
+                    <MudButton Color="Color.Error"
+                               Variant="Variant.Text"
+                               OnClick="() => RemoveFromCart(item.Product)"
+                               Style="padding: 4px 8px; font-size: 12px;">
+                        Remove
+                    </MudButton>
+                </div>
+            }
+
+            <MudDivider />
+
+            <MudText Typo="Typo.body1" Align="Align.Center"><strong>Total: @CartService.GetTotalPrice().ToString("C")</strong></MudText>
+
+            <MudButton Class="mt-2"
+                       Color="Color.Primary"
+                       OnClick="BuyNow"
+                       FullWidth="true"
+                       Variant="Variant.Filled">
+                Buy Now
+            </MudButton>
+        </MudPaper>
+    </MudPopover>
+    </div>
+</div>
+
+@code {
+    private bool isCartOpen = false;
+
+    protected override void OnInitialized()
+    {
+        CartService.OnChange += StateHasChanged;
+    }
+
+    private void ToggleCartView()
+    {
+        isCartOpen = !isCartOpen;
+    }
+
+    private void BuyNow()
+    {
+        NavigationManager.NavigateTo("/checkout");
+        isCartOpen = !isCartOpen;
+    }
+    private void RemoveFromCart(ProductDto product)
+    {
+        CartService.RemoveFromCart(product);
+    }
+    private void UpdateCart(CartItem item)
+    {
+        CartService.UpdateCart(item);
+    }
+
+    public void Dispose()
+    {
+        CartService.OnChange -= StateHasChanged;
+    }
+}

@@ -20,6 +20,5 @@ namespace ECommerce.Frontend.Services
             return response.IsSuccessStatusCode;
         }
 
-        // Other user-related methods...
     }
 }

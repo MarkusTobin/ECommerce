@@ -23,10 +23,14 @@ namespace ECommerce.Frontend.Services
             return await _httpClient.GetFromJsonAsync<CustomerDto>($"api/customers/search/{email}");
         }
 
-        public async Task<bool> CreateCustomerAsync(CustomerDto customer)
+        public async Task<CustomerDto> CreateCustomerAsync(CustomerDto customer)
         {
             var response = await _httpClient.PostAsJsonAsync("api/customers", customer);
-            return response.IsSuccessStatusCode;
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<CustomerDto>();
+            }
+            return null;
         }
 
         public async Task<bool> UpdateCustomerAsync(string id, CustomerDto customer)

@@ -18,8 +18,4 @@
     <ProjectReference Include="..\ECommerce.Shared\ECommerce.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Components\Modals\" />
-  </ItemGroup>
-
 </Project>

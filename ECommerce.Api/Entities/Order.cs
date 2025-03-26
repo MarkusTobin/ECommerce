@@ -12,6 +12,8 @@ namespace ECommerce.Api.Entities
 
         [BsonRepresentation(BsonType.ObjectId)]
         public string? CustomerId { get; set; }
+        public string? CustomerFullName { get; set; }
+
 
         public DateTime OrderDate { get; set; }
         public decimal TotalPrice { get; set; }

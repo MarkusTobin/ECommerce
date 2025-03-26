@@ -12,5 +12,6 @@ namespace ECommerce.Shared.Dtos
         [MinLength(6, ErrorMessage = "Password must be at least 6 characters.")]
         public string Password { get; set; } = null!;
         public string Role { get; set; } = "User";
+        public string CustomerId { get; set; } = null!;
     }
 }
