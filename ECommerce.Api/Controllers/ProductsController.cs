@@ -51,14 +51,14 @@ namespace ECommerce.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(ProductDto productDto)
+        public async Task<IActionResult> Create([FromBody] ProductDto productDto)
         {
             var product = await productService.CreateProductAsync(productDto);
             return Ok(product);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, ProductDto productDto)
+        public async Task<IActionResult> Update(string id, [FromBody] ProductDto productDto)
         {
             var product = await productService.UpdateProductAsync(id, productDto);
             if (product == null)

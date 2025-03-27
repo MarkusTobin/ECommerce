@@ -1,7 +1,5 @@
 ﻿@page "/checkout"
-@using ECommerce.Frontend.Services
-@using ECommerce.Shared.Dtos
-@using Microsoft.AspNetCore.Components.Authorization
+@using ECommerce.Frontend.Components.PagesComponents.CheckoutComponents
 @inject CartService CartService
 @inject NavigationManager NavigationManager
 
@@ -15,26 +13,8 @@
 }
 else
 {
-    <MudTable Items="cartItems" Hover="true">
-        <HeaderContent>
-            <MudTh>Product</MudTh>
-            <MudTh>Price</MudTh>
-            <MudTh>Quantity</MudTh>
-            <MudTh>Total</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Product">@context.Product.Name</MudTd>
-            <MudTd DataLabel="Price">@context.Product.Price.ToString("C")</MudTd>
-            <MudTd DataLabel="Quantity">@context.Quantity</MudTd>
-            <MudTd DataLabel="Total">@string.Format("{0:C}", @context.Product.Price * @context.Quantity)</MudTd>
-        </RowTemplate>
-    </MudTable>
-
-    <MudText Typo="Typo.h6">Total Price: @CartService.GetTotalPrice().ToString("C")</MudText>
-
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="FillOutInformation">
-        Fill out information
-    </MudButton>
+    <CartItems/>
+    <OrderConfirmation/>
 }
 
 @code {
@@ -45,8 +25,4 @@ else
         cartItems = CartService.GetCart();
     }
 
-    private void FillOutInformation()
-    {
-        NavigationManager.NavigateTo("/orderconfirmation");
-    }
 }

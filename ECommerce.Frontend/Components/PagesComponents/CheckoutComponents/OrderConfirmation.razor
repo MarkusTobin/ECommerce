@@ -1,5 +1,4 @@
-﻿@page "/orderconfirmation"
-@using System.Text.RegularExpressions
+﻿@using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 @using ECommerce.Shared.Dtos
 @inject NavigationManager NavigationManager
@@ -15,21 +14,12 @@
                 <MudTextField T="string" @bind-Value="customer.FirstName" Label="First Name" Required="true" RequiredError="First name is required!" />
                 <MudTextField T="string" @bind-Value="customer.LastName" Label="Last Name" Required="true" RequiredError="Last name is required!" />
                 <MudTextField T="string" @bind-Value="customer.Email" Label="Email" Required="true" RequiredError="Email is required!"/>
-                <MudTextField T="string" @bind-Value="customer.PhoneNumber" Label="Phone Number" RequiredError="Phone number is required"/>
-                <MudTextField T="string" @bind-Value="customer.Address" Label="Address" RequiredError="Adress is required"/>
+                <MudTextField T="string" @bind-Value="customer.PhoneNumber" Label="Phone Number" Required="true" RequiredError="Phone number is required" />
+                <MudTextField T="string" @bind-Value="customer.Address" Label="Address" Required="true" RequiredError="Adress is required" />
                 <div class="d-flex align-center justify-space-between">
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" OnClick="SubmitOrder">Submit Order</MudButton>
                 </div>
             </MudForm>
-        </MudPaper>
-    </MudItem>
-    <MudItem xs="12" sm="5">
-        <MudPaper Class="pa-4 mud-height-full">
-            <MudText Typo="Typo.subtitle2">@($"Errors ({errors.Length})")</MudText>
-            @foreach (var error in errors)
-            {
-                <MudText Color="@Color.Error">@error</MudText>
-            }
         </MudPaper>
     </MudItem>
 </MudGrid>
