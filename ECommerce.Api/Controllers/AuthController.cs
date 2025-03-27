@@ -17,7 +17,7 @@ namespace ECommerce.Api.Controllers
         public async Task<IActionResult> LoginAndAuth([FromBody] UserLoginDto userLoginDto)
         {
 
-            var user = await userService.GetByUsernameAsync(userLoginDto.Username);
+            var user = await userService.GetByEmailAsync(userLoginDto.Email.ToLower()); //här
             if (user == null)
             return Unauthorized("Invalid credentials.");
 
@@ -29,7 +29,7 @@ namespace ECommerce.Api.Controllers
 
             try
             {
-                var token = await authService.GenerateJwtToken(user.Username, userLoginDto.Password);
+                var token = await authService.GenerateJwtToken(user.Email, userLoginDto.Password);
 
                 if (string.IsNullOrEmpty(token))
                     return Unauthorized("Token generation failed.");

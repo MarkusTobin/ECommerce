@@ -5,19 +5,21 @@
 @inject CartService CartService
 @inject CustomerService CustomerService
 @inject OrderService OrderService
-
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <MudGrid>
     <MudItem xs="12" sm="7">
         <MudPaper Class="pa-4">
-            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" OnFieldChanged="OnFieldChanged">
                 <MudTextField T="string" @bind-Value="customer.FirstName" Label="First Name" Required="true" RequiredError="First name is required!" />
                 <MudTextField T="string" @bind-Value="customer.LastName" Label="Last Name" Required="true" RequiredError="Last name is required!" />
-                <MudTextField T="string" @bind-Value="customer.Email" Label="Email" Required="true" RequiredError="Email is required!"/>
+                <MudTextField T="string" @bind-Value="customer.Email" Label="Email" Required="true" RequiredError="Email is required!" />
                 <MudTextField T="string" @bind-Value="customer.PhoneNumber" Label="Phone Number" Required="true" RequiredError="Phone number is required" />
-                <MudTextField T="string" @bind-Value="customer.Address" Label="Address" Required="true" RequiredError="Adress is required" />
+                <MudTextField T="string" @bind-Value="customer.Address" Label="Address" Required="true" RequiredError="Address is required" />
+                <MudCheckBox @bind-Value="termsAccepted" Label="Bought is bought and can never come back" />
+
                 <div class="d-flex align-center justify-space-between">
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" OnClick="SubmitOrder">Submit Order</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success || !termsAccepted)" Class="ml-auto" OnClick="SubmitOrder">Submit Order</MudButton>
                 </div>
             </MudForm>
         </MudPaper>
@@ -26,30 +28,48 @@
 
 @code {
     bool success;
+    bool termsAccepted;
+
     string[] errors = { };
     MudForm form;
     private CustomerDto customer = new CustomerDto();
     private string errorMessage;
 
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var email = user.FindFirst(c => c.Type == "unique_name")?.Value; ;
+            if (!string.IsNullOrEmpty(email))
+            {
+                var existingCustomer = await CustomerService.GetCustomerByEmailAsync(email);
+                if (existingCustomer != null)
+                {
+                    customer = existingCustomer;
+                }
+            }
+        }
+    }
+    private async Task OnFieldChanged()
+    {
+        await form.Validate();
+    }
     private async Task SubmitOrder()
     {
         await form.Validate();
-        if (success)
+        if (success && termsAccepted)
         {
             Console.WriteLine("Form validation successful.");
             var existingCustomer = await CustomerService.GetCustomerByEmailAsync(customer.Email);
             CustomerDto customerToUse;
 
-            if (existingCustomer != null && existingCustomer.FirstName == customer.FirstName && existingCustomer.LastName == customer.LastName)
+            if (existingCustomer != null)
             {
                 Console.WriteLine($"Customer with email {customer.Email} found with ID: {existingCustomer.Id}");
                 customerToUse = existingCustomer;
-            }
-            else if (existingCustomer != null)
-            {
-                errorMessage = "A customer with this email already exists but the name does not match. Please check your details.";
-                Console.WriteLine("Customer email exists but name does not match.");
-                return;
             }
             else
             {
@@ -79,6 +99,7 @@
                 {
                     CustomerId = customerToUse.Id,
                     CustomerFullName = $"{customerToUse.FirstName} {customerToUse.LastName}",
+                    CustomerEmail = customerToUse.Email,
                     OrderDate = DateTime.Now,
                     TotalPrice = CartService.GetTotalPrice(),
                     OrderDetails = orderDetails
@@ -90,7 +111,7 @@
                 Console.WriteLine($"Order created with ID: {createdOrder.Id}");
                 CartService.ClearCart();
                 Console.WriteLine("Cart cleared.");
-                NavigationManager.NavigateTo("/");
+                NavigationManager.NavigateTo("/thanks-for-ordering");
             }
             else
             {

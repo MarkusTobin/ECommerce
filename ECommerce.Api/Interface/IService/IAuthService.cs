@@ -5,7 +5,7 @@ namespace ECommerce.Api.Interface.IService
 {
     public interface IAuthService
     {
-        Task<string> GenerateJwtToken(string username, string password);
+        Task<string> GenerateJwtToken(string email, string password);
         Task<User?> LoginAsync(UserLoginDto userLoginDto);
     }
 }

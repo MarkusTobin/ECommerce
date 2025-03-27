@@ -1,4 +1,4 @@
-﻿@page "/products"
+﻿@page "/"
 @using ECommerce.Frontend.Services
 @using ECommerce.Shared.Dtos
 @using Microsoft.AspNetCore.Components.Authorization
@@ -18,15 +18,6 @@
     </ItemTemplate>
 </MudAutocomplete>
 <h3>Products</h3>
-
-@if (userRole == "Admin")
-{
-    <p>Hello admin</p>
-}
-@if (userRole == "User")
-{
-    <p>Hello user</p>
-}
 
 @if (products == null)
 {

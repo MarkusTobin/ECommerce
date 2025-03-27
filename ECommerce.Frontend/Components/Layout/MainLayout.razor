@@ -30,7 +30,7 @@
             <CartIcon />
             @if (isAuthenticated)
             {
-                <span>Hello, @username</span>
+                <span>Hello and welcome!</span>
                 <button class="btn btn-link" @onclick="Logout">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
@@ -57,7 +57,7 @@
 
 @code {
     private bool isAuthenticated;
-    private string? username;
+    private string? email;
 
     protected override async Task OnInitializedAsync()
     {
@@ -72,7 +72,7 @@
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
             isAuthenticated = user.Identity.IsAuthenticated;
-            username = user.FindFirst("unique_name")?.Value;
+            email = user.FindFirst("unique_email")?.Value;  // "unique_email"
             StateHasChanged();
         }
     }
@@ -94,7 +94,7 @@
         var authState = task.Result;
         var user = authState.User;
         isAuthenticated = user.Identity.IsAuthenticated;
-        username = user.FindFirst("unique_name")?.Value;
+        email = user.FindFirst("unique_email")?.Value; // "unique_email" is the claim type we set in the AuthService
 
         StateHasChanged();
     }

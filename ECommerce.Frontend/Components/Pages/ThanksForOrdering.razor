@@ -1,0 +1,19 @@
+﻿@page "/thanks-for-ordering"
+@using MudBlazor
+@inject NavigationManager NavigationManager
+
+<MudContainer>
+    <MudText Typo="Typo.h3" Align="Align.Center" Class="mt-4">Thank You for Your Order!</MudText>
+    <MudText Typo="Typo.body1" Align="Align.Center" Class="mt-2">Bought is bought and can never come back!.</MudText>
+    <MudButton Color="Color.Primary" Class="mt-4" OnClick="GoToHomePage" FullWidth="true">
+        Go to Homepage
+    </MudButton>
+</MudContainer>
+
+@code {
+    private void GoToHomePage()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}
+

@@ -23,9 +23,9 @@ namespace ECommerce.Api.Repository
             await base.UpdateAsync(id, user);
         }
 
-        public async Task<User> GetUserByUsernameAsync(string username)
+        public async Task<User> GetUserByEmailAsync(string email)
         {
-            return await _collection.Find(x => x.Username == username).FirstOrDefaultAsync();
+            return await _collection.Find(x => x.Email == email).FirstOrDefaultAsync();
         }
 
     }

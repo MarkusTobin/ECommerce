@@ -27,7 +27,8 @@ namespace ECommerce.Api.Services
 
         public async Task<User> LoginAsync(UserLoginDto userLoginDto)
         {
-            var user = await _userRepository.GetUserByUsernameAsync(userLoginDto.Username);
+            var email = userLoginDto.Email.ToLowerInvariant(); 
+            var user = await _userRepository.GetUserByEmailAsync(email);
             if (user == null) return null;
 
 
@@ -38,13 +39,13 @@ namespace ECommerce.Api.Services
             return user;
         }
 
-        public async Task<string> GenerateJwtToken(string username, string password)
+        public async Task<string> GenerateJwtToken(string email, string password)
         {
-            var user = await _userRepository.GetUserByUsernameAsync(username);
+            var user = await _userRepository.GetUserByEmailAsync(email);
 
             if (user == null || !_passwordHashingService.VerifyPassword(user.PasswordHash, password))
             {
-                throw new UnauthorizedAccessException("Invalid username or password.");
+                throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
             if (string.IsNullOrEmpty(_jwtSettings.Key))
@@ -59,7 +60,7 @@ namespace ECommerce.Api.Services
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                        new Claim(ClaimTypes.Name, user.Username),
+                        new Claim(ClaimTypes.Name, user.Email),
                         new Claim(ClaimTypes.Role, user.Role)
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),

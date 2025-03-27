@@ -1,7 +1,13 @@
-﻿@page "/customerinformation"
-<h3>CustomerPage</h3>
+﻿@page "/customer"
 
-@code {
+@inject OrderService OrderService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@using ECommerce.Shared.Dtos
+@using MudBlazor
+@using MudBlazor.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@using ECommerce.Frontend.Components.PagesComponents.CustomerPageComponents
 
-    // to show the ordernumber of the order you need to be logged in
-}
+
+<YourOrdersPage/>

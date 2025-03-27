@@ -18,9 +18,25 @@ namespace ECommerce.Frontend.Services
             return await _httpClient.GetFromJsonAsync<CustomerDto>($"api/customers/{id}");
         }
 
-        public async Task<CustomerDto> GetCustomerByEmailAsync(string email)
+        public async Task<CustomerDto?> GetCustomerByEmailAsync(string email)
         {
-            return await _httpClient.GetFromJsonAsync<CustomerDto>($"api/customers/search/{email}");
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/customers/search/{email}");
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<CustomerDto>();
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Request error: {ex.Message}");
+                // Log the response status code and content for further analysis
+                Console.WriteLine($"Response status code: {ex.StatusCode}");
+                return null;
+            }
         }
 
         public async Task<CustomerDto> CreateCustomerAsync(CustomerDto customer)
