@@ -33,7 +33,6 @@ namespace ECommerce.Frontend.Services
             catch (HttpRequestException ex)
             {
                 Console.WriteLine($"Request error: {ex.Message}");
-                // Log the response status code and content for further analysis
                 Console.WriteLine($"Response status code: {ex.StatusCode}");
                 return null;
             }

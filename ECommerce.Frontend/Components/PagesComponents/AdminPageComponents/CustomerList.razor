@@ -1,13 +1,22 @@
 ﻿@inject CustomerService CustomerService
+@inject IDialogService DialogService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 @using ECommerce.Shared.Dtos
 @using MudBlazor
 @using MudBlazor.Services
+@using ECommerce.Frontend.Components.Dialogs
+
+<MudAutocomplete T="string" Label="Search" Placeholder="Find customer.." SearchFunc="SearchCustomers" @bind-Value="searchText" Immediate="true" DebounceInterval="300" ResetValueOnEmptyText="true" >
+    <ItemTemplate>
+        @((MarkupString)context)
+    </ItemTemplate>
+</MudAutocomplete>
 
 <MudCard>
     <MudCardContent>
         <MudText Typo="Typo.h5">Customers</MudText>
-
-        <MudTable Items="customers">
+        <MudTable Items="filteredCustomers" Dense Hover="true" @bind-SelectedItem="selectedCustomer" @ref="mudTable" CommitEditIcon="">
             <HeaderContent>
                 <MudTh>First Name</MudTh>
                 <MudTh>Last Name</MudTh>
@@ -16,25 +25,55 @@
                 <MudTh>Address</MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
-            <RowTemplate Context="customer">
-                <MudTd>@customer.FirstName</MudTd>
-                <MudTd>@customer.LastName</MudTd>
-                <MudTd>@customer.Email</MudTd>
-                <MudTd>@customer.PhoneNumber</MudTd>
-                <MudTd>@customer.Address</MudTd>
+            <RowTemplate>
+                <MudTd DataLabel="First Name">@context.FirstName</MudTd>
+                <MudTd DataLabel="Last Name">@context.LastName</MudTd>
+                <MudTd DataLabel="Email">@context.Email</MudTd>
+                <MudTd DataLabel="Phone">@context.PhoneNumber</MudTd>
+                <MudTd DataLabel="Address">@context.Address</MudTd>
+
                 <MudTd>
-                    <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" OnClick="() => EditCustomer(customer)" />
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => DeleteCustomer(customer.Id)" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => ConfirmDeleteCustomer(context.Id)" />
                 </MudTd>
             </RowTemplate>
+            <RowEditingTemplate>
+                <MudTd DataLabel="First Name">
+                    <MudTextField @bind-Value="@context.FirstName" Required />
+                </MudTd>
+                <MudTd DataLabel="Last Name">
+                    <MudTextField @bind-Value="@context.LastName" Required />
+                </MudTd>
+                <MudTd DataLabel="Email">
+                    <MudTextField @bind-Value="@context.Email" Required />
+                </MudTd>
+                <MudTd DataLabel="Phone">
+                    <MudTextField @bind-Value="@context.PhoneNumber" Required />
+                </MudTd>
+                <MudTd DataLabel="Address">
+                    <MudTextField @bind-Value="@context.Address" Required />
+                </MudTd>
+                <MudTd>
+                    <MudButton OnClick="@(() => ConfirmSaveEditCustomer(context))" Color="Color.Primary">Save</MudButton>
+                </MudTd>
+            </RowEditingTemplate>
         </MudTable>
     </MudCardContent>
 </MudCard>
 
 @code {
     private List<CustomerDto> customers = new();
+    private List<CustomerDto> filteredCustomers = new();
+
     private CustomerDto editingCustomer = new();
+    private CustomerDto originalCustomer = new();
+
+    private CustomerDto selectedCustomer;
+    private MudTable<CustomerDto> mudTable;
     private bool isDialogOpen = false;
+    private string[] errors = { };
+    private bool isAuthenticated = false;
+    private string searchText = string.Empty;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -43,11 +82,55 @@
 
     private async Task LoadCustomers()
     {
-        customers = await CustomerService.GetAllCustomersAsync();
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity.IsAuthenticated;
+
+        if (isAuthenticated)
+        {
+            customers = await CustomerService.GetAllCustomersAsync();
+            filteredCustomers = customers;
+
+        }
+    }
+
+    private async Task<IEnumerable<string>> SearchCustomers(string searchText, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            filteredCustomers = customers;
+            StateHasChanged();
+            return new List<string>();
+        }
+
+        filteredCustomers = customers.Where(c => c != null &&
+                                    (c.Email != null && c.Email.Contains(searchText, StringComparison.OrdinalIgnoreCase)))
+                                     .ToList();
+
+        StateHasChanged();
+        return filteredCustomers.Select(c => $"{c.Email}").ToList();
+    }
+
+    private void ResetSearch()
+    {
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            searchText = string.Empty;
+            filteredCustomers = customers;
+            StateHasChanged();
+        }
     }
 
     private void EditCustomer(CustomerDto customer)
     {
+        originalCustomer = new CustomerDto
+            {
+                Id = customer.Id,
+                FirstName = customer.FirstName,
+                LastName = customer.LastName,
+                Email = customer.Email,
+                PhoneNumber = customer.PhoneNumber,
+                Address = customer.Address,
+            };
         editingCustomer = new CustomerDto
         {
             Id = customer.Id,
@@ -58,6 +141,73 @@
             Address = customer.Address
         };
         isDialogOpen = true;
+    }
+
+    private async Task ConfirmSaveEditCustomer(CustomerDto customer)
+    {
+        var parameters = new DialogParameters
+        {
+            { "ContentText", "Are you sure you want to save the changes?" },
+            { "ButtonText", "Save" },
+            { "Color", Color.Primary }
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+
+        var dialog = DialogService.Show<ConfirmDialog>("Save Changes", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await SaveEditCustomer(customer);
+        }
+        else
+        {
+            RevertChanges(customer);
+        }
+        await LoadCustomers();
+    }
+
+    private async Task SaveEditCustomer(CustomerDto customer)
+    {
+        await CustomerService.UpdateCustomerAsync(customer.Id, customer);
+        await LoadCustomers();
+        mudTable.SetEditingItem(null);
+    }
+
+    private void RevertChanges(CustomerDto customer)
+    {
+        customer.FirstName = originalCustomer.FirstName;
+        customer.LastName = originalCustomer.LastName;
+        customer.Email = originalCustomer.Email;
+        customer.PhoneNumber = originalCustomer.PhoneNumber;
+        customer.Address = originalCustomer.Address;
+        mudTable.SetEditingItem(null);
+
+    }
+    private void CancelEdit()
+    {
+        isDialogOpen = false;
+    }
+
+    private async Task ConfirmDeleteCustomer(string id)
+    {
+        var parameters = new DialogParameters
+        {
+            { "ContentText", "Are you sure you want to delete this customer?" },
+            { "ButtonText", "Delete" },
+            { "Color", Color.Error }
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+
+        var dialog = DialogService.Show<ConfirmDialog>("Delete Customer", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await DeleteCustomer(id);
+        }
     }
     private async Task DeleteCustomer(string id)
     {

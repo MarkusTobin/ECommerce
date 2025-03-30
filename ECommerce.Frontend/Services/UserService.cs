@@ -20,5 +20,14 @@ namespace ECommerce.Frontend.Services
             return response.IsSuccessStatusCode;
         }
 
+        public async Task<UserDto> GetUserByEmailAsync(string email)
+        {
+            var response = await _httpClient.GetAsync($"api/user/by-email/{email}");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<UserDto>();
+            }
+            return null;
+        }
     }
 }

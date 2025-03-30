@@ -12,7 +12,7 @@
 @rendermode InteractiveServer
 
 <PageTitle>Product List</PageTitle>
-<MudAutocomplete T="string" Label="Search" Placeholder="Find products.." SearchFunc="SearchProducts">
+<MudAutocomplete T="string" Label="Search" Placeholder="Find products.." SearchFunc="SearchProducts" ValueChanged="NavigateToProduct">
     <ItemTemplate>
         @((MarkupString)context)
     </ItemTemplate>
@@ -110,16 +110,16 @@ else
         }
     }
 
-    private async Task<IEnumerable<string>> SearchProducts(string name, CancellationToken cancellationToken)
+    private async Task<IEnumerable<string>> SearchProducts(string searchText, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrWhiteSpace(searchText))
             return new List<string>();
 
         return products?
             .Where(p => p != null &&
-                        (p.Name != null && p.Name.Contains(name, StringComparison.OrdinalIgnoreCase) ||
-                         p.ProductNumber != null && p.ProductNumber.Contains(name, StringComparison.OrdinalIgnoreCase)))
-            .Select(p => $"<a href=\"/products/name/{p.Name}\">{p.Name} ({p.ProductNumber})</a>")
+                        (p.Name != null && p.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                         p.ProductNumber != null && p.ProductNumber.Contains(searchText, StringComparison.OrdinalIgnoreCase)))
+            .Select(p => $"{p.Name} ({p.ProductNumber})")
             .ToList() ?? new List<string>();
     }
 
@@ -142,8 +142,9 @@ else
         product.IsAvailable = true;
         StateHasChanged();
     }
-    private void NavigateToProduct(string productName)
+    private void NavigateToProduct(string selectedProduct)
     {
+        var productName = selectedProduct.Split(' ')[0];
         NavigationManager.NavigateTo($"/products/name/{productName}");
     }
 }
