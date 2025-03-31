@@ -1,14 +1,14 @@
 ﻿using ECommerce.Shared.Dtos;
-using static System.Net.WebRequestMethods;
 
 namespace ECommerce.Frontend.Services
 {
     public class CustomerService
     {
         private readonly HttpClient _httpClient;
+        private readonly UserService _userService;
 
-        public CustomerService(HttpClient httpClient) => _httpClient = httpClient;
-
+        public CustomerService(HttpClient httpClient, UserService userService) =>
+            (_httpClient, _userService) = (httpClient, userService);
         public async Task<List<CustomerDto>> GetAllCustomersAsync()
         {
             return await _httpClient.GetFromJsonAsync<List<CustomerDto>>("api/customers");
@@ -40,6 +40,13 @@ namespace ECommerce.Frontend.Services
 
         public async Task<CustomerDto> CreateCustomerAsync(CustomerDto customer)
         {
+            // Makes sure the userId is transfered to Customer.UserId
+            var user = await _userService.GetUserByEmailAsync(customer.Email);
+            if (user != null)
+            {
+                customer.UserId = user.Id;
+            }
+
             var response = await _httpClient.PostAsJsonAsync("api/customers", customer);
             if (response.IsSuccessStatusCode)
             {

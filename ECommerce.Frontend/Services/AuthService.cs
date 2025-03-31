@@ -1,9 +1,6 @@
 ﻿using ECommerce.Shared.Dtos;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using System.Net.Http.Headers;
 

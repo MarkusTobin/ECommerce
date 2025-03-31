@@ -1,15 +1,9 @@
 ﻿@page "/"
-@using ECommerce.Frontend.Services
-@using ECommerce.Shared.Dtos
-@using Microsoft.AspNetCore.Components.Authorization
-@using ECommerce.Frontend.Models
-@using MudBlazor
-@using MudBlazor.Services
 @inject ProductService ProductService
 @inject CartService CartService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
-@rendermode InteractiveServer
+
 
 <PageTitle>Product List</PageTitle>
 <MudAutocomplete T="string" Label="Search" Placeholder="Find products.." SearchFunc="SearchProducts" ValueChanged="NavigateToProduct">

@@ -3,6 +3,7 @@ using ECommerce.Api.Entities;
 using ECommerce.Api.Interface.IService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ECommerce.Api.Controllers
 {
@@ -49,7 +50,7 @@ namespace ECommerce.Api.Controllers
             }
             return Ok(product);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ProductDto productDto)
         {

@@ -1,8 +1,7 @@
 ﻿@page "/products/name/{productName}"
-@using ECommerce.Frontend.Services
-@using ECommerce.Shared.Dtos
 @inject ProductService ProductService
 @inject CartService CartService
+
 @code {
     [Parameter]
     public string ProductName { get; set; }

@@ -1,7 +1,4 @@
-﻿using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using ECommerce.Shared.Dtos;
+﻿using ECommerce.Shared.Dtos;
 
 namespace ECommerce.Frontend.Services
 {

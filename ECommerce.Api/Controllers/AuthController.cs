@@ -17,7 +17,7 @@ namespace ECommerce.Api.Controllers
         public async Task<IActionResult> LoginAndAuth([FromBody] UserLoginDto userLoginDto)
         {
 
-            var user = await userService.GetByEmailAsync(userLoginDto.Email.ToLower()); //här
+            var user = await userService.GetByEmailAsync(userLoginDto.Email.ToLower());
             if (user == null)
             return Unauthorized("Invalid credentials.");
 

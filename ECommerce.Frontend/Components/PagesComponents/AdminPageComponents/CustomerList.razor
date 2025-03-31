@@ -3,11 +3,6 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserService UserService
 
-@using ECommerce.Shared.Dtos
-@using MudBlazor
-@using MudBlazor.Services
-@using ECommerce.Frontend.Components.Dialogs
-
 <MudAutocomplete T="string" Label="Search" Placeholder="Find customer.." SearchFunc="SearchCustomers" @bind-Value="searchText" Immediate="true" DebounceInterval="300" ResetValueOnEmptyText="true" >
     <ItemTemplate>
         @((MarkupString)context)

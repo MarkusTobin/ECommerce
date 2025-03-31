@@ -1,7 +1,4 @@
 ﻿using ECommerce.Shared.Dtos;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
 
 namespace ECommerce.Frontend.Services
 {
@@ -19,7 +16,15 @@ namespace ECommerce.Frontend.Services
             var response = await _httpClient.PostAsJsonAsync("api/user/register", userRegisterDto);
             return response.IsSuccessStatusCode;
         }
-
+        public async Task<UserDto> GetUserByIdAsync(string id)
+        {
+            var response = await _httpClient.GetAsync($"api/user/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<UserDto>();
+            }
+            return null;
+        }
         public async Task<UserDto> GetUserByEmailAsync(string email)
         {
             var response = await _httpClient.GetAsync($"api/user/by-email/{email}");

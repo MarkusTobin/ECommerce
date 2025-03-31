@@ -1,7 +1,4 @@
-﻿@using System.Text.RegularExpressions
-@using System.ComponentModel.DataAnnotations
-@using ECommerce.Shared.Dtos
-@inject NavigationManager NavigationManager
+﻿@inject NavigationManager NavigationManager
 @inject CartService CartService
 @inject CustomerService CustomerService
 @inject OrderService OrderService
@@ -62,13 +59,11 @@
         await form.Validate();
         if (success && termsAccepted)
         {
-            Console.WriteLine("Form validation successful.");
             var existingCustomer = await CustomerService.GetCustomerByEmailAsync(customer.Email);
             CustomerDto customerToUse;
 
             if (existingCustomer != null)
             {
-                Console.WriteLine($"Customer with email {customer.Email} found with ID: {existingCustomer.Id}");
                 customerToUse = existingCustomer;
             }
             else
@@ -76,13 +71,11 @@
                 var createdCustomer = await CustomerService.CreateCustomerAsync(customer);
                 if (createdCustomer != null && !string.IsNullOrEmpty(createdCustomer.Id))
                 {
-                    Console.WriteLine($"Customer created with ID: {createdCustomer.Id}");
                     customerToUse = createdCustomer;
                 }
                 else
                 {
                     errorMessage = "Customer creation failed. Please try again later.";
-                    Console.WriteLine("Customer creation failed.");
                     return;
                 }
             }
@@ -108,21 +101,17 @@
             var createdOrder = await OrderService.CreateOrderAsync(order);
             if (createdOrder != null)
             {
-                Console.WriteLine($"Order created with ID: {createdOrder.Id}");
                 CartService.ClearCart();
-                Console.WriteLine("Cart cleared.");
                 NavigationManager.NavigateTo("/thanks-for-ordering");
             }
             else
             {
                 errorMessage = "Order creation failed. Please try again later.";
-                Console.WriteLine("Order creation failed.");
             }
         }
         else
         {
             errorMessage = "Form validation failed. Please check the form and try again.";
-            Console.WriteLine("Form validation failed.");
         }
     }
 }
