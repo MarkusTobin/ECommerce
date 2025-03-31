@@ -1,5 +1,4 @@
-﻿using ECommerce.Api.Dtos;
-using ECommerce.Api.DTOs;
+﻿using ECommerce.Shared.Dtos;
 using ECommerce.Api.Entities;
 using ECommerce.Api.Interface.IService;
 using ECommerce.Api.Mapper;
@@ -15,6 +14,13 @@ namespace ECommerce.Api.Controllers
     [ApiController]
     public class OrdersController(OrderService orderService) : ControllerBase
     {
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var orders = await orderService.GetAllOrdersAsync();
+            return Ok(orders);
+        }
+
         [HttpGet("customer/{customerId}")]
         public async Task<IActionResult> GetOrdersByCustomerId(string customerId)
         {
@@ -33,11 +39,16 @@ namespace ECommerce.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(OrderDto orderDto)
+        public async Task<IActionResult> Create([FromBody] OrderDto orderDto)
         {
             var order = await orderService.CreateOrderAsync(orderDto);
             return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
         }
-
+        [HttpGet("customer/email/{email}")]
+        public async Task<IActionResult> GetOrdersByCustomerEmail(string email)
+        {
+            var orders = await orderService.GetOrdersByCustomerEmailAsync(email);
+            return Ok(orders);
+        }
     }
 }

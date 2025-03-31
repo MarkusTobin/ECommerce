@@ -1,4 +1,4 @@
-﻿using ECommerce.Api.Dtos;
+﻿using ECommerce.Shared.Dtos;
 using ECommerce.Api.Entities;
 using ECommerce.Api.Interface.IService;
 using ECommerce.Api.Mapper;
@@ -44,14 +44,14 @@ namespace ECommerce.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CustomerDto customerDto)
+        public async Task<IActionResult> Create([FromBody] CustomerDto customerDto)
         {
             var customer = await customerService.CreateCustomerAsync(customerDto);
             return Ok(customer);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, CustomerDto customerDto)
+        public async Task<IActionResult> Update(string id, [FromBody] CustomerDto customerDto)
         {
             var customer = await customerService.UpdateCustomerAsync(id, customerDto);
             if (customer == null)

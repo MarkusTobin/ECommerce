@@ -18,7 +18,7 @@ namespace ECommerce.Api.Infrastructure
             _jwtSettings = jwtSettings.Value;
         }
 
-        public string GenerateToken(string userId, string userName, string role)
+        public string GenerateToken(string userId, string email, string role)
         {
             var secretKey = _jwtSettings.Key;
             var issuer = _jwtSettings.Issuer;
@@ -36,7 +36,7 @@ namespace ECommerce.Api.Infrastructure
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, userId),
-                new Claim(JwtRegisteredClaimNames.UniqueName, userName),
+                new Claim(JwtRegisteredClaimNames.UniqueName, email),//remove
                 new Claim(ClaimTypes.Role, role),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };

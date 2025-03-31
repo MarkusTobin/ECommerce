@@ -1,0 +1,91 @@
+﻿@page "/register"
+@inject UserService UserService
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Register</PageTitle>
+
+<div class="register-container">
+    <h3>Register</h3>
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="text" id="email" class="form-control" @bind="email" />
+    </div>
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" class="form-control" @bind="password" />
+    </div>
+    <div class="form-group">
+        <label for="confirmPassword">Confirm Password:</label>
+        <input type="password" id="confirmPassword" class="form-control" @bind="confirmPassword" />
+    </div>
+    <div class="form-group">
+        <button class="btn btn-primary" @onclick="Register">Register</button>
+    </div>
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger mt-3">
+            @errorMessage
+        </div>
+    }
+</div>
+
+@code {
+    private string email;
+    private string password;
+    private string confirmPassword;
+    private string errorMessage;
+
+    private async Task Register()
+    {
+        if (password != confirmPassword)
+        {
+            errorMessage = "Passwords do not match.";
+            return;
+        }
+
+        var registerDto = new UserRegisterDto
+            {
+                Email = email.ToLowerInvariant(),
+                Password = password,
+                Role = "User"
+
+                
+            };
+
+        try
+        {
+            var isSuccess = await UserService.RegisterUserAsync(registerDto);
+
+            if (isSuccess)
+            {
+                var loginDto = new UserLoginDto
+                    {
+                        Email = email.ToLowerInvariant(),
+                        Password = password
+                    };
+
+                var loginSuccess = await AuthService.LoginAsync(loginDto);
+
+                if (loginSuccess)
+                {
+                    Navigation.NavigateTo("");
+                }
+                else
+                {
+                    errorMessage = "Registration successful, but login failed.";
+                }
+            }
+            else
+            {
+                errorMessage = "Registration failed, Email might be occupied or you didnt put a valid Email.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+
+    }
+}

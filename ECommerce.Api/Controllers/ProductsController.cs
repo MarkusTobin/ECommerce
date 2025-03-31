@@ -1,8 +1,9 @@
-﻿using ECommerce.Api.Dtos;
+﻿using ECommerce.Shared.Dtos;
 using ECommerce.Api.Entities;
 using ECommerce.Api.Interface.IService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ECommerce.Api.Controllers
 {
@@ -49,16 +50,16 @@ namespace ECommerce.Api.Controllers
             }
             return Ok(product);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> Create(ProductDto productDto)
+        public async Task<IActionResult> Create([FromBody] ProductDto productDto)
         {
             var product = await productService.CreateProductAsync(productDto);
             return Ok(product);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, ProductDto productDto)
+        public async Task<IActionResult> Update(string id, [FromBody] ProductDto productDto)
         {
             var product = await productService.UpdateProductAsync(id, productDto);
             if (product == null)

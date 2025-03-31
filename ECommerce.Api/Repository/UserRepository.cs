@@ -3,7 +3,6 @@ using ECommerce.Api.Interface.IRepository;
 using ECommerce.Api.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using System.Security.Cryptography.X509Certificates;
 
 namespace ECommerce.Api.Repository
 {
@@ -24,9 +23,9 @@ namespace ECommerce.Api.Repository
             await base.UpdateAsync(id, user);
         }
 
-        public async Task<User> GetUserByUsernameAsync(string username)
+        public async Task<User> GetUserByEmailAsync(string email)
         {
-            return await _collection.Find(x => x.Username == username).FirstOrDefaultAsync();
+            return await _collection.Find(x => x.Email == email).FirstOrDefaultAsync();
         }
 
     }

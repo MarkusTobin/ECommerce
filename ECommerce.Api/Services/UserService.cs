@@ -2,7 +2,7 @@
 using ECommerce.Api.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using ECommerce.Api.Dtos;
+using ECommerce.Shared.Dtos;
 using ECommerce.Api.Mapper;
 using ECommerce.Api.Interface.IRepository;
 using ECommerce.Api.Interface.IService;
@@ -27,14 +27,14 @@ namespace ECommerce.Api.Services
 
         public async Task<bool> CreateUserAsync(UserRegisterDto userRegisterDto)
         {
-            var existingUser = await repository.GetUserByUsernameAsync(userRegisterDto.Username);
+            var existingUser = await repository.GetUserByEmailAsync(userRegisterDto.Email);
             if (existingUser != null) return false;
 
             var passwordHash = passwordHashingService.HashPassword(userRegisterDto.Password!);
 
             var user = new User
             {
-                Username = userRegisterDto.Username,
+                Email = userRegisterDto.Email.ToLowerInvariant(),
                 PasswordHash = passwordHash,
                 Role = userRegisterDto.Role
             };
@@ -49,7 +49,7 @@ namespace ECommerce.Api.Services
             if (user == null) return false; 
 
 
-            user.Username = userDto.Username;
+            user.Email = userDto.Email.ToLowerInvariant();
             user.Role = userDto.Role;
 
             await repository.UpdateAsync(userDto.Id, user);
@@ -62,25 +62,11 @@ namespace ECommerce.Api.Services
             return true;
         }
 
-        public async Task<User> GetByUsernameAsync(string username)
+        public async Task<User> GetByEmailAsync(string email)
         {
-            var user = await repository.GetUserByUsernameAsync(username);
+            var user = await repository.GetUserByEmailAsync(email);
             if (user == null) return null;
             return user;
         }
-
-        public async Task<User> LoginAsync(UserLoginDto userLoginDto)
-        {
-            var user = await repository.GetUserByUsernameAsync(userLoginDto.Username);
-            if (user == null) return null; 
-   
-
-            if (!passwordHashingService.VerifyPassword(userLoginDto.Password, user.PasswordHash))
-            {
-                return null; 
-            }
-            return user;
-        }
-
     }
 }

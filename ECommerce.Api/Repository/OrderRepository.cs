@@ -24,5 +24,10 @@ namespace ECommerce.Api.Repository
             var filter = Builders<Order>.Filter.Eq(c => c.CustomerId, customerId);
             return await _collection.Find(filter).ToListAsync();
         }
+        public async Task<IEnumerable<Order>> GetOrdersByCustomerEmailAsync(string email)
+        {
+            var filter = Builders<Order>.Filter.Eq(c => c.CustomerEmail, email);
+            return await _collection.Find(filter).ToListAsync();
+        }
     }
 }

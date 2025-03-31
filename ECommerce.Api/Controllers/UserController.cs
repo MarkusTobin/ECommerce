@@ -1,4 +1,4 @@
-﻿using ECommerce.Api.Dtos;
+﻿using ECommerce.Shared.Dtos;
 using ECommerce.Api.Entities;
 using ECommerce.Api.Interface.IService;
 using ECommerce.Api.Mapper;
@@ -12,7 +12,6 @@ namespace ECommerce.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
     public class UserController(IUserService userService) : ControllerBase
     {
         [HttpPost("register")]
@@ -27,9 +26,9 @@ namespace ECommerce.Api.Controllers
 
             var result = await userService.CreateUserAsync(userRegisterDto);
             if (!result)
-                return Conflict("Username already exists.");
+                return Conflict("Email already exists.");
 
-            return CreatedAtAction(nameof(GetUserByUsername), new { username = userRegisterDto.Username }, null);
+            return CreatedAtAction(nameof(GetUserByEmail), new { email = userRegisterDto.Email }, null);
         }
 
         [HttpGet("{id}")]
@@ -44,13 +43,13 @@ namespace ECommerce.Api.Controllers
             return Ok(user);
         }
 
-        [HttpGet("by-username/{username}")]
-        public async Task<IActionResult> GetUserByUsername(string username)
+        [HttpGet("by-email/{email}")]
+        public async Task<IActionResult> GetUserByEmail(string email)
         {
-            if (string.IsNullOrEmpty(username))
+            if (string.IsNullOrEmpty(email))
                 return BadRequest("User data is required.");
 
-            var user = await userService.GetByUsernameAsync(username);
+            var user = await userService.GetByEmailAsync(email);
             if (user == null) return NotFound("User not found.");
 
             return Ok(user);

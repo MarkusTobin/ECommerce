@@ -1,0 +1,66 @@
+﻿@page "/login"
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Login</PageTitle>
+
+<div class="login-container">
+    <h3>Login</h3>
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="text" id="email" class="form-control" @bind="email" />
+    </div>
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" class="form-control" @bind="password" />
+    </div>
+    <div class="form-group">
+        <button class="btn btn-primary" @onclick="Login">Login</button>
+        <button class="btn btn-secondary" @onclick="Register">Register</button>
+    </div>
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger mt-3">
+            @errorMessage
+        </div>
+    }
+</div>
+
+@code {
+    private string email;
+    private string password;
+    private string errorMessage;
+
+    private async Task Login()
+    {
+        var loginDto = new UserLoginDto
+            {
+                Email = email,
+                Password = password
+            };
+
+        try
+        {
+            var isSuccess = await AuthService.LoginAsync(loginDto);
+
+            if (isSuccess)
+            {
+                Navigation.NavigateTo("");
+            }
+            else
+            {
+                errorMessage = "Invalid credentials or an error occurred.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+    }
+
+    private void Register()
+    {
+        Navigation.NavigateTo("/register");
+    }
+}
