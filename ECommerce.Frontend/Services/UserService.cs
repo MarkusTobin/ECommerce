@@ -29,5 +29,14 @@ namespace ECommerce.Frontend.Services
             }
             return null;
         }
+        public async Task<UserDto> UpdateUserAsync(string id, UserDto userDto)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"api/user/{id}", userDto);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<UserDto>();
+            }
+            return null;
+        }
     }
 }

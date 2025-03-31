@@ -30,7 +30,7 @@
             <CartIcon />
             @if (isAuthenticated)
             {
-                <span>Hello and welcome!</span>
+                <span>Hello @userRole!</span>
                 <button class="btn btn-link" @onclick="Logout">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
@@ -58,6 +58,8 @@
 @code {
     private bool isAuthenticated;
     private string? email;
+    private string? userRole;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -73,6 +75,8 @@
             var user = authState.User;
             isAuthenticated = user.Identity.IsAuthenticated;
             email = user.FindFirst("unique_email")?.Value; 
+            userRole = user.Claims.FirstOrDefault(c => c.Type == "role")?.Value; // Added this line
+
             StateHasChanged();
         }
     }
@@ -95,6 +99,8 @@
         var user = authState.User;
         isAuthenticated = user.Identity.IsAuthenticated;
         email = user.FindFirst("unique_email")?.Value;
+        userRole = user.Claims.FirstOrDefault(c => c.Type == "role")?.Value; // Added this line
+
 
         StateHasChanged();
     }

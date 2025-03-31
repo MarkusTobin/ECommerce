@@ -1,6 +1,7 @@
 ﻿@inject CustomerService CustomerService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IDialogService DialogService
+@inject UserService UserService
 @using ECommerce.Shared.Dtos
 @using MudBlazor
 @using MudBlazor.Services
@@ -60,29 +61,6 @@
         }
     }
 
-    private void EditCustomer(CustomerDto customer)
-    {
-        originalCustomer = new CustomerDto
-            {
-                Id = customer.Id,
-                FirstName = customer.FirstName,
-                LastName = customer.LastName,
-                Email = customer.Email,
-                PhoneNumber = customer.PhoneNumber,
-                Address = customer.Address,
-            };
-        editingCustomer = new CustomerDto
-            {
-                Id = customer.Id,
-                FirstName = customer.FirstName,
-                LastName = customer.LastName,
-                Email = customer.Email,
-                PhoneNumber = customer.PhoneNumber,
-                Address = customer.Address
-            };
-        isDialogOpen = true;
-    }
-
     private async Task ConfirmSaveEditCustomer()
     {
         var parameters = new DialogParameters
@@ -110,6 +88,16 @@
     private async Task SaveEditCustomer()
     {
         await CustomerService.UpdateCustomerAsync(editingCustomer.Id, editingCustomer);
+        if (originalCustomer.Email != editingCustomer.Email)
+        {
+            var user = await UserService.GetUserByEmailAsync(originalCustomer.Email);
+            if (user != null)
+            {
+                user.Email = editingCustomer.Email;
+                await UserService.UpdateUserAsync(user.Id, user);
+                originalCustomer.Email = editingCustomer.Email;
+            }
+        }
 
     }
 

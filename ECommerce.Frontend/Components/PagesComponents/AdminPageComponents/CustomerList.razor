@@ -1,6 +1,7 @@
 ﻿@inject CustomerService CustomerService
 @inject IDialogService DialogService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserService UserService
 
 @using ECommerce.Shared.Dtos
 @using MudBlazor
@@ -36,7 +37,8 @@
                     <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => ConfirmDeleteCustomer(context.Id)" />
                 </MudTd>
             </RowTemplate>
-            <RowEditingTemplate>
+            <RowEditingTemplate Context="context" > 
+
                 <MudTd DataLabel="First Name">
                     <MudTextField @bind-Value="@context.FirstName" Required />
                 </MudTd>
@@ -120,29 +122,6 @@
         }
     }
 
-    private void EditCustomer(CustomerDto customer)
-    {
-        originalCustomer = new CustomerDto
-            {
-                Id = customer.Id,
-                FirstName = customer.FirstName,
-                LastName = customer.LastName,
-                Email = customer.Email,
-                PhoneNumber = customer.PhoneNumber,
-                Address = customer.Address,
-            };
-        editingCustomer = new CustomerDto
-        {
-            Id = customer.Id,
-            FirstName = customer.FirstName,
-            LastName = customer.LastName,
-            Email = customer.Email,
-            PhoneNumber = customer.PhoneNumber,
-            Address = customer.Address
-        };
-        isDialogOpen = true;
-    }
-
     private async Task ConfirmSaveEditCustomer(CustomerDto customer)
     {
         var parameters = new DialogParameters
@@ -167,7 +146,7 @@
         }
         await LoadCustomers();
     }
-
+    //fix here so that customers user email also gets changed correctly
     private async Task SaveEditCustomer(CustomerDto customer)
     {
         await CustomerService.UpdateCustomerAsync(customer.Id, customer);
