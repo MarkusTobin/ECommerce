@@ -1,7 +1,11 @@
-﻿namespace ECommerce.Api.Dtos
+﻿using System.Text.Json.Serialization;
+
+namespace ECommerce.Shared.Dtos
 {
     public class ProductDto
     {
+        [JsonIgnore]
+        public string? Id { get; set; }
         public string? Name { get; set; }
         public string? ProductNumber { get; set; }
         public decimal Price { get; set; }

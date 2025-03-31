@@ -1,29 +1,27 @@
-﻿using ECommerce.Api.Dtos;
+﻿using ECommerce.Shared.Dtos;
 using ECommerce.Api.Entities;
 using ECommerce.Api.Interface.IService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ECommerce.Api.Controllers
 {
     [Route("api/products")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class ProductsController(IProductService productService) : ControllerBase
     {
-        private readonly IProductService _productService;
-        public ProductsController(IProductService productService) => _productService = productService;
-
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var products = await _productService.GetProductsAsync();
+            var products = await productService.GetProductsAsync();
             return Ok(products);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
-            var product = await _productService.GetProductAsync(id);
+            var product = await productService.GetProductAsync(id);
             if (product == null)
             {
                 return NotFound();
@@ -34,7 +32,7 @@ namespace ECommerce.Api.Controllers
         [HttpGet("search/name/{name}")]
         public async Task<IActionResult> GetByProductName(string name)
         {
-            var product = await _productService.GetProductByNameAsync(name);
+            var product = await productService.GetProductByNameAsync(name);
             if (product == null)
             {
                 return NotFound();
@@ -45,25 +43,25 @@ namespace ECommerce.Api.Controllers
         [HttpGet("search/productNumber/{productNumber}")]
         public async Task<IActionResult> GetByProductNumber(string productNumber)
         {
-            var product = await _productService.GetProductByProductNumberAsync(productNumber);
+            var product = await productService.GetProductByProductNumberAsync(productNumber);
             if (product == null)
             {
                 return NotFound();
             }
             return Ok(product);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> Create(ProductDto productDto)
+        public async Task<IActionResult> Create([FromBody] ProductDto productDto)
         {
-            var product = await _productService.CreateProductAsync(productDto);
+            var product = await productService.CreateProductAsync(productDto);
             return Ok(product);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, ProductDto productDto)
+        public async Task<IActionResult> Update(string id, [FromBody] ProductDto productDto)
         {
-            var product = await _productService.UpdateProductAsync(id, productDto);
+            var product = await productService.UpdateProductAsync(id, productDto);
             if (product == null)
             {
                 return NotFound();
@@ -74,7 +72,7 @@ namespace ECommerce.Api.Controllers
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateStatus(string id, [FromBody] ProductDto productDto)
         {
-            var product = await _productService.UpdateProductAsync(id, productDto);
+            var product = await productService.UpdateProductAsync(id, productDto);
             if (product == null)
             {
                 return NotFound("Product not found");
@@ -85,7 +83,7 @@ namespace ECommerce.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            var success = await _productService.DeleteProductAsync(id);
+            var success = await productService.DeleteProductAsync(id);
             if (!success)
             {
                 return NotFound("Product not found");

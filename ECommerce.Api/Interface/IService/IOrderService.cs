@@ -1,5 +1,5 @@
 ﻿using ECommerce.Api.Entities;
-using ECommerce.Api.DTOs;
+using ECommerce.Shared.Dtos;
 
 namespace ECommerce.Api.Interface.IService
 {

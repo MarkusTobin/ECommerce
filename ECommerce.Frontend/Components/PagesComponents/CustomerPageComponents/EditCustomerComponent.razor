@@ -1,0 +1,108 @@
+﻿@inject CustomerService CustomerService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IDialogService DialogService
+@inject UserService UserService
+
+<MudCard>
+    <MudCardContent>
+        <MudText Typo="Typo.h5">Edit Your Information</MudText>
+        <MudForm @ref="form" Model="editingCustomer" OnValidSubmit="ConfirmSaveEditCustomer">
+            <MudTextField @bind-Value="editingCustomer.FirstName" Label="First Name" Required="true" />
+            <MudTextField @bind-Value="editingCustomer.LastName" Label="Last Name" Required="true" />
+            <MudTextField @bind-Value="editingCustomer.Email" Label="Email" Required="true" />
+            <MudTextField @bind-Value="editingCustomer.PhoneNumber" Label="Phone" Required="true" />
+            <MudTextField @bind-Value="editingCustomer.Address" Label="Address" Required="true" />
+            <MudButton Type="Submit" Color="Color.Primary" OnClick="ConfirmSaveEditCustomer">Save</MudButton>
+        </MudForm>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    private CustomerDto editingCustomer = new();
+    private CustomerDto originalCustomer = new();
+    private MudForm form;
+    private bool isAuthenticated = false;
+    private bool isDialogOpen = false;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            if (user.Identity.IsAuthenticated)
+            {
+                isAuthenticated = true;
+                var email = user.FindFirst(c => c.Type == "unique_name")?.Value;
+                if (!string.IsNullOrEmpty(email))
+                {
+                    var existingCustomer = await CustomerService.GetCustomerByEmailAsync(email);
+                    if (existingCustomer != null)
+                    {
+                        editingCustomer = existingCustomer;
+                        originalCustomer = new CustomerDto
+                            {
+                                Id = existingCustomer.Id,
+                                FirstName = existingCustomer.FirstName,
+                                LastName = existingCustomer.LastName,
+                                Email = existingCustomer.Email,
+                                PhoneNumber = existingCustomer.PhoneNumber,
+                                Address = existingCustomer.Address
+                            };
+                        StateHasChanged();
+                    }
+                }
+            }
+        }
+    }
+
+    private async Task ConfirmSaveEditCustomer()
+    {
+        var parameters = new DialogParameters
+        {
+            { "ContentText", "Are you sure you want to save the changes?" },
+            { "ButtonText", "Save" },
+            { "Color", Color.Primary }
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+
+        var dialog = DialogService.Show<ConfirmDialog>("Save Changes", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await SaveEditCustomer();
+        }
+        else
+        {
+            RevertChanges();
+        }
+    }
+
+    private async Task SaveEditCustomer()
+    {
+        await CustomerService.UpdateCustomerAsync(editingCustomer.Id, editingCustomer);
+        if (originalCustomer.Email != editingCustomer.Email)
+        {
+            var user = await UserService.GetUserByEmailAsync(originalCustomer.Email);
+            if (user != null)
+            {
+                user.Email = editingCustomer.Email;
+                await UserService.UpdateUserAsync(user.Id, user);
+                originalCustomer.Email = editingCustomer.Email;
+            }
+        }
+
+    }
+
+    private void RevertChanges()
+    {
+        editingCustomer.FirstName = originalCustomer.FirstName;
+        editingCustomer.LastName = originalCustomer.LastName;
+        editingCustomer.Email = originalCustomer.Email;
+        editingCustomer.PhoneNumber = originalCustomer.PhoneNumber;
+        editingCustomer.Address = originalCustomer.Address;
+    }
+}

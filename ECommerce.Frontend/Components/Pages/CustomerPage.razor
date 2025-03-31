@@ -1,0 +1,32 @@
+﻿@page "/customer"
+
+@inject OrderService OrderService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<EditCustomerComponent/>
+<YourOrdersComponent/>
+
+
+@code {
+    private string? userRole;
+    private bool isInitialized;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !isInitialized)
+        {
+            try
+            {
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                var user = authState.User;
+                userRole = user.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+            isInitialized = true;
+            StateHasChanged();
+        }
+    }
+}

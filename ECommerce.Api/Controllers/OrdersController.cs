@@ -1,5 +1,4 @@
-﻿using ECommerce.Api.Dtos;
-using ECommerce.Api.DTOs;
+﻿using ECommerce.Shared.Dtos;
 using ECommerce.Api.Entities;
 using ECommerce.Api.Interface.IService;
 using ECommerce.Api.Mapper;
@@ -13,21 +12,25 @@ namespace ECommerce.Api.Controllers
 {
     [Route("api/orders")]
     [ApiController]
-    public class OrdersController : ControllerBase
+    public class OrdersController(OrderService orderService) : ControllerBase
     {
-        private readonly OrderService _orderService;
-        public OrdersController(OrderService orderService) => _orderService = orderService;
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var orders = await orderService.GetAllOrdersAsync();
+            return Ok(orders);
+        }
 
         [HttpGet("customer/{customerId}")]
         public async Task<IActionResult> GetOrdersByCustomerId(string customerId)
         {
-            var orders = await _orderService.GetOrdersByCustomerIdAsync(customerId);
+            var orders = await orderService.GetOrdersByCustomerIdAsync(customerId);
             return Ok(orders);
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
-            var order = await _orderService.GetOrderAsync(id);
+            var order = await orderService.GetOrderAsync(id);
             if (order == null)
             {
                 return NotFound();
@@ -36,11 +39,16 @@ namespace ECommerce.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(OrderDto orderDto)
+        public async Task<IActionResult> Create([FromBody] OrderDto orderDto)
         {
-            var order = await _orderService.CreateOrderAsync(orderDto);
+            var order = await orderService.CreateOrderAsync(orderDto);
             return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
         }
-
+        [HttpGet("customer/email/{email}")]
+        public async Task<IActionResult> GetOrdersByCustomerEmail(string email)
+        {
+            var orders = await orderService.GetOrdersByCustomerEmailAsync(email);
+            return Ok(orders);
+        }
     }
 }

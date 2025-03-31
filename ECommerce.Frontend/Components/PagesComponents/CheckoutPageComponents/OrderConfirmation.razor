@@ -1,0 +1,117 @@
+﻿@inject NavigationManager NavigationManager
+@inject CartService CartService
+@inject CustomerService CustomerService
+@inject OrderService OrderService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<MudGrid>
+    <MudItem xs="12" sm="7">
+        <MudPaper Class="pa-4">
+            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" OnFieldChanged="OnFieldChanged">
+                <MudTextField T="string" @bind-Value="customer.FirstName" Label="First Name" Required="true" RequiredError="First name is required!" />
+                <MudTextField T="string" @bind-Value="customer.LastName" Label="Last Name" Required="true" RequiredError="Last name is required!" />
+                <MudTextField T="string" @bind-Value="customer.Email" Label="Email" Required="true" RequiredError="Email is required!" />
+                <MudTextField T="string" @bind-Value="customer.PhoneNumber" Label="Phone Number" Required="true" RequiredError="Phone number is required" />
+                <MudTextField T="string" @bind-Value="customer.Address" Label="Address" Required="true" RequiredError="Address is required" />
+                <MudCheckBox @bind-Value="termsAccepted" Label="Bought is bought and can never come back" />
+
+                <div class="d-flex align-center justify-space-between">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success || !termsAccepted)" Class="ml-auto" OnClick="SubmitOrder">Submit Order</MudButton>
+                </div>
+            </MudForm>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    bool success;
+    bool termsAccepted;
+
+    string[] errors = { };
+    MudForm form;
+    private CustomerDto customer = new CustomerDto();
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var email = user.FindFirst(c => c.Type == "unique_name")?.Value; ;
+            if (!string.IsNullOrEmpty(email))
+            {
+                var existingCustomer = await CustomerService.GetCustomerByEmailAsync(email);
+                if (existingCustomer != null)
+                {
+                    customer = existingCustomer;
+                }
+            }
+        }
+    }
+    private async Task OnFieldChanged()
+    {
+        await form.Validate();
+    }
+    private async Task SubmitOrder()
+    {
+        await form.Validate();
+        if (success && termsAccepted)
+        {
+            var existingCustomer = await CustomerService.GetCustomerByEmailAsync(customer.Email);
+            CustomerDto customerToUse;
+
+            if (existingCustomer != null)
+            {
+                customerToUse = existingCustomer;
+            }
+            else
+            {
+                var createdCustomer = await CustomerService.CreateCustomerAsync(customer);
+                if (createdCustomer != null && !string.IsNullOrEmpty(createdCustomer.Id))
+                {
+                    customerToUse = createdCustomer;
+                }
+                else
+                {
+                    errorMessage = "Customer creation failed. Please try again later.";
+                    return;
+                }
+            }
+
+            var orderDetails = CartService.CartItems.Select(item => new OrderDetailDto
+                {
+                    ProductId = item.Product.Id,
+                    ProductName = item.Product.Name,
+                    Quantity = item.Quantity,
+                    UnitPrice = item.Product.Price
+                }).ToList();
+
+            var order = new OrderDto
+                {
+                    CustomerId = customerToUse.Id,
+                    CustomerFullName = $"{customerToUse.FirstName} {customerToUse.LastName}",
+                    CustomerEmail = customerToUse.Email,
+                    OrderDate = DateTime.Now,
+                    TotalPrice = CartService.GetTotalPrice(),
+                    OrderDetails = orderDetails
+                };
+
+            var createdOrder = await OrderService.CreateOrderAsync(order);
+            if (createdOrder != null)
+            {
+                CartService.ClearCart();
+                NavigationManager.NavigateTo("/thanks-for-ordering");
+            }
+            else
+            {
+                errorMessage = "Order creation failed. Please try again later.";
+            }
+        }
+        else
+        {
+            errorMessage = "Form validation failed. Please check the form and try again.";
+        }
+    }
+}

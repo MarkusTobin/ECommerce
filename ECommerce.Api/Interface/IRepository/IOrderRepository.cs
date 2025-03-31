@@ -5,5 +5,7 @@ namespace ECommerce.Api.Interface.IRepository
     public interface IOrderRepository : IRepository<Order>
     {
         Task<IEnumerable<Order>> GetOrdersByCustomerIdAsync(string customerId);
+        Task<IEnumerable<Order>> GetOrdersByCustomerEmailAsync(string email);
+
     }
 }

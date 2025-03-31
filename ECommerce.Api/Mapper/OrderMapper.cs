@@ -1,5 +1,4 @@
-﻿using ECommerce.Api.Dtos;
-using ECommerce.Api.DTOs;
+﻿using ECommerce.Shared.Dtos;
 using ECommerce.Api.Entities;
 using Mapster;
 

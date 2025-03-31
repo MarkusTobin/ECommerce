@@ -1,0 +1,40 @@
+﻿@inject OrderService OrderService
+
+<MudCard>
+    <MudCardContent>
+        <MudText Typo="Typo.h5">Orders</MudText>
+
+        <MudTable Items="orders">
+            <HeaderContent>
+                <MudTh>Order ID</MudTh>
+                <MudTh>Customer Name</MudTh>
+                <MudTh>Customer Email</MudTh>
+                <MudTh>Order Date</MudTh>
+                <MudTh>Total Price</MudTh>
+            </HeaderContent>
+            <RowTemplate Context="order">
+                <MudTd>
+                    <MudLink Href="@($"/orders/{order.Id}")">@order.Id</MudLink>
+                </MudTd>
+                <MudTd>@order.CustomerFullName</MudTd>
+                <MudTd>@order.CustomerEmail</MudTd>
+                <MudTd>@order.OrderDate.ToString("g")</MudTd>
+                <MudTd>@order.TotalPrice.ToString("C")</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    private List<OrderDto> orders = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadOrders();
+    }
+
+    private async Task LoadOrders()
+    {
+        orders = await OrderService.GetAllOrdersAsync();
+    }
+}
