@@ -1,6 +1,6 @@
 ## Configuring `appsettings.json` for the Application
 
-In order to make this work, you'll need to add a `appsettings.json` file in the `ECommerce.Api` project with the appropriate configuration settings.
+In order to make this work, you'll need to add `appsettings.json` file in the `ECommerce.Api` project with the appropriate configuration settings.
 
 ### Steps:
 
@@ -24,3 +24,6 @@ In order to make this work, you'll need to add a `appsettings.json` file in the 
     "ExpiryMinutes": 60
   }
 }
+
+```
+#### Api spec exists in 'ECommerce.Api/docs/Apispec.md'
