@@ -90,5 +90,18 @@ namespace ECommerce.Api.Controllers
             }
             return Ok(new { Success = true, Message = $"Product successfully deleted" });
         }
+
+        [HttpPost("purchase")]
+        public async Task<IActionResult> PurchaseProduct([FromBody] PurchaseRequestDto purchaseRequest)
+        {
+            var success = await productService.PurchaseProductAsync(purchaseRequest.ProductId, purchaseRequest.RequestedQuantity);
+
+            if (!success)
+            {
+                return BadRequest("Not enough stock or product not found.");
+            }
+
+            return Ok("Purchase successful.");
+        }
     }
 }

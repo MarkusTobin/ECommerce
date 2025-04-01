@@ -1,4 +1,6 @@
-﻿namespace ECommerce.Api.Interface.IRepository
+﻿using MongoDB.Driver;
+
+namespace ECommerce.Api.Interface.IRepository
 {
     public interface IRepository<T> where T : class
     {
@@ -7,5 +9,6 @@
         Task CreateAsync(T entity);
         Task UpdateAsync(string id, T entity);
         Task DeleteAsync(string id);
+        void UpdateSession(IClientSessionHandle session);
     }
 }

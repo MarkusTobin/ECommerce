@@ -10,11 +10,17 @@ namespace ECommerce.Api.Repository
     public class Repository<T> : IRepository<T> where T : class
     {
         protected readonly IMongoCollection<T> _collection;
-        protected readonly IClientSessionHandle _session;
+        protected IClientSessionHandle _session;
 
-        public Repository(IMongoDatabase database, IClientSessionHandle session)
+        public Repository(IOptions<MongoDBSettings> settings, IClientSessionHandle session)
         {
+            var client = new MongoClient(settings.Value.ConnectionString);
+            var database = client.GetDatabase(settings.Value.DatabaseName);
             _collection = database.GetCollection<T>(typeof(T).Name);
+            _session = session;
+        }
+        public void UpdateSession(IClientSessionHandle session)
+        {
             _session = session;
         }
 
@@ -45,5 +51,6 @@ namespace ECommerce.Api.Repository
 
             await _collection.DeleteOneAsync(_session, Builders<T>.Filter.Eq("_id", objectId));
         }
+
     }
 }

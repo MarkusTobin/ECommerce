@@ -12,5 +12,6 @@ namespace ECommerce.Api.Interface.IService
         Task<bool> DeleteProductAsync(string id);
         Task<ProductDto> GetProductByNameAsync(string name);
         Task<ProductDto> GetProductByProductNumberAsync(string productNumber);
+        Task<bool> PurchaseProductAsync(string productId, int requestedQuantity);
     }
 }

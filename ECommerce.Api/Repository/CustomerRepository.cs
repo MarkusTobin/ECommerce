@@ -8,7 +8,7 @@ namespace ECommerce.Api.Repository
 {
     public class CustomerRepository : Repository<Customer>, ICustomerRepository
     {
-        public CustomerRepository(IOptions<MongoDBSettings> settings) : base(settings)
+        public CustomerRepository(IOptions<MongoDBSettings> settings, IClientSessionHandle session) : base(settings, session)
         {
         }
 

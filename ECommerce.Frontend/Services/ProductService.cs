@@ -51,5 +51,15 @@ namespace ECommerce.Frontend.Services
             var response = await _httpClient.DeleteAsync($"api/products/{id}");
             return response.IsSuccessStatusCode;
         }
+        public async Task<bool> BuyProductAsync(string productId, int requestedQuantity)
+        {
+            var purchaseRequest = new PurchaseRequestDto
+            {
+                ProductId = productId,
+                RequestedQuantity = requestedQuantity
+            };
+            var response = await _httpClient.PostAsJsonAsync("api/products/purchase", purchaseRequest);
+            return response.IsSuccessStatusCode; 
+        }
     }
 }

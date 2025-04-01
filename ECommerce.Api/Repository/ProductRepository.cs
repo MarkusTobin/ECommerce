@@ -9,8 +9,9 @@ namespace ECommerce.Api.Repository
 
     public class ProductRepository : Repository<Product>, IProductRepository
     {
-        public ProductRepository(IOptions<MongoDBSettings> settings) : base(settings)
+        public ProductRepository(IOptions<MongoDBSettings> settings, IClientSessionHandle session) : base(settings, session)
         {
+
         }
 
         public override async Task CreateAsync(Product product)

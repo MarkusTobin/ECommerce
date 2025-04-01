@@ -9,15 +9,28 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using ECommerce.Api.Entities;
 using Microsoft.Extensions.Options;
+using ECommerce.Api.Infrastructure.UnitOfWork;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Bind MongoDB settings
 builder.Services.Configure<MongoDBSettings>(
 builder.Configuration.GetSection(nameof(MongoDBSettings)));
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
-// Add services to the container.
+builder.Services.AddSingleton<IMongoClient, MongoClient>(sp =>
+{
+    var settings = MongoClientSettings.FromConnectionString(
+        builder.Configuration.GetSection(nameof(MongoDBSettings)).Get<MongoDBSettings>().ConnectionString);
+    return new MongoClient(settings);
+});
+
+builder.Services.AddScoped(sp =>
+{
+    var client = sp.GetRequiredService<IMongoClient>();
+    return client.StartSession();
+});
+
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
@@ -30,6 +43,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordHashingService, PasswordHashingService>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<OrderService>();
 
