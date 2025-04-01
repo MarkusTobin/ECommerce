@@ -42,6 +42,7 @@
             var email = user.FindFirst(c => c.Type == "unique_name")?.Value; ;
             if (!string.IsNullOrEmpty(email))
             {
+                customer.Email = email;
                 var existingCustomer = await CustomerService.GetCustomerByEmailAsync(email);
                 if (existingCustomer != null)
                 {

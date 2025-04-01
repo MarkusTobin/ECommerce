@@ -8,8 +8,7 @@ namespace ECommerce.Api.Repository
 {
     public class UserRepository : Repository<User>, IUserRepository
     {
-        private readonly IMongoCollection<User> _users;
-        public UserRepository(IOptions<MongoDBSettings> settings) : base(settings)
+        public UserRepository(IOptions<MongoDBSettings> settings, IClientSessionHandle session) : base(settings, session)
         {
         }
 

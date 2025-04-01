@@ -8,7 +8,7 @@ namespace ECommerce.Api.Repository
 {
     public class OrderRepository : Repository<Order>, IOrderRepository
     {
-        public OrderRepository(IOptions<MongoDBSettings> settings) : base(settings)
+        public OrderRepository(IOptions<MongoDBSettings> settings, IClientSessionHandle session) : base(settings, session)
         {
         }
         public override async Task CreateAsync(Order order)

@@ -3,6 +3,8 @@
 @inject OrderService OrderService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
+@inject CustomerService CustomerService
+
 
 <EditCustomerComponent/>
 <YourOrdersComponent/>
@@ -11,6 +13,7 @@
 @code {
     private string? userRole;
     private bool isInitialized;
+    private bool isCustomer = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

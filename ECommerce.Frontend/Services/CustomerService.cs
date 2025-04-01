@@ -41,12 +41,12 @@ namespace ECommerce.Frontend.Services
         public async Task<CustomerDto> CreateCustomerAsync(CustomerDto customer)
         {
             // Makes sure the userId is transfered to Customer.UserId
+            customer.Email = customer.Email.ToLower();
             var user = await _userService.GetUserByEmailAsync(customer.Email);
             if (user != null)
             {
                 customer.UserId = user.Id;
             }
-
             var response = await _httpClient.PostAsJsonAsync("api/customers", customer);
             if (response.IsSuccessStatusCode)
             {

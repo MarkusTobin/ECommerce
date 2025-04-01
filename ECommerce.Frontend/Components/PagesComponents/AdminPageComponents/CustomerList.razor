@@ -141,7 +141,6 @@
         }
         await LoadCustomers();
     }
-    //fix here so that customers user email also gets changed correctly
     private async Task SaveEditCustomer(CustomerDto customer)
     {
         await CustomerService.UpdateCustomerAsync(customer.Id, customer);

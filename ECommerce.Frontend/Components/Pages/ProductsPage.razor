@@ -125,15 +125,16 @@ else
             CartService.AddToCart(product, quantity);
         }
     }
-
-    private void MarkAsUnavailable(ProductDto product)
+    private async Task MarkAsUnavailable(ProductDto product)
     {
         product.IsAvailable = false;
+        await ProductService.UpdateProductAsync(product.Id, product);
         StateHasChanged();
     }
-    private void MarkAsAvailable(ProductDto product)
+    private async Task MarkAsAvailable(ProductDto product)
     {
         product.IsAvailable = true;
+        await ProductService.UpdateProductAsync(product.Id, product);
         StateHasChanged();
     }
     private void NavigateToProduct(string selectedProduct)

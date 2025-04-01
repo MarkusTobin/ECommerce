@@ -68,8 +68,8 @@
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
             isAuthenticated = user.Identity.IsAuthenticated;
-            email = user.FindFirst("unique_email")?.Value; 
-            userRole = user.Claims.FirstOrDefault(c => c.Type == "role")?.Value; // Added this line
+            email = user.FindFirst("unique_name")?.Value;
+            userRole = user.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
 
             StateHasChanged();
         }
@@ -92,8 +92,8 @@
         var authState = task.Result;
         var user = authState.User;
         isAuthenticated = user.Identity.IsAuthenticated;
-        email = user.FindFirst("unique_email")?.Value;
-        userRole = user.Claims.FirstOrDefault(c => c.Type == "role")?.Value; // Added this line
+        email = user.FindFirst("unique_name")?.Value;
+        userRole = user.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
 
 
         StateHasChanged();
