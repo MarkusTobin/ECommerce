@@ -5,16 +5,10 @@
 @inject NavigationManager NavigationManager
 @inject CustomerService CustomerService
 
-@if (isCustomer)
-{
-    <EditCustomerComponent />
-    <YourOrdersComponent />
-}
-else
-{
-    <h3>Customer Page</h3>
-    <p>Only customers can access this page.</p>
-}
+
+<EditCustomerComponent/>
+<YourOrdersComponent/>
+
 
 @code {
     private string? userRole;
@@ -37,11 +31,5 @@ else
             isInitialized = true;
             StateHasChanged();
         }
-    }
-
-    private async Task<bool> CheckIfUserIsCustomer(string email)
-    {
-        var customer = await CustomerService.GetCustomerByEmailAsync(email);
-        return customer != null;
     }
 }

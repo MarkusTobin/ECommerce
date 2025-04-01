@@ -2,20 +2,28 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IDialogService DialogService
 @inject UserService UserService
+@inject OrderService OrderService
 
-<MudCard>
-    <MudCardContent>
-        <MudText Typo="Typo.h5">Edit Your Information</MudText>
-        <MudForm @ref="form" Model="editingCustomer" OnValidSubmit="ConfirmSaveEditCustomer">
-            <MudTextField @bind-Value="editingCustomer.FirstName" Label="First Name" Required="true" />
-            <MudTextField @bind-Value="editingCustomer.LastName" Label="Last Name" Required="true" />
-            <MudTextField @bind-Value="editingCustomer.Email" Label="Email" Required="true" />
-            <MudTextField @bind-Value="editingCustomer.PhoneNumber" Label="Phone" Required="true" />
-            <MudTextField @bind-Value="editingCustomer.Address" Label="Address" Required="true" />
-            <MudButton Type="Submit" Color="Color.Primary" OnClick="ConfirmSaveEditCustomer">Save</MudButton>
-        </MudForm>
-    </MudCardContent>
-</MudCard>
+@if (hasOrders)
+{
+    <MudCard>
+        <MudCardContent>
+            <MudText Typo="Typo.h5">Edit Your Information</MudText>
+            <MudForm @ref="form" Model="editingCustomer" OnValidSubmit="ConfirmSaveEditCustomer">
+                <MudTextField @bind-Value="editingCustomer.FirstName" Label="First Name" Required="true" />
+                <MudTextField @bind-Value="editingCustomer.LastName" Label="Last Name" Required="true" />
+                <MudTextField @bind-Value="editingCustomer.Email" Label="Email" Required="true" />
+                <MudTextField @bind-Value="editingCustomer.PhoneNumber" Label="Phone" Required="true" />
+                <MudTextField @bind-Value="editingCustomer.Address" Label="Address" Required="true" />
+                <MudButton Type="Submit" Color="Color.Primary" OnClick="ConfirmSaveEditCustomer">Save</MudButton>
+            </MudForm>
+        </MudCardContent>
+    </MudCard>
+}
+else
+{
+    <p>You need to be a customer to edit your information, please go buy something.</p>
+}
 
 @code {
     private CustomerDto editingCustomer = new();
@@ -23,7 +31,7 @@
     private MudForm form;
     private bool isAuthenticated = false;
     private bool isDialogOpen = false;
-
+    private bool hasOrders = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -50,6 +58,9 @@
                                 PhoneNumber = existingCustomer.PhoneNumber,
                                 Address = existingCustomer.Address
                             };
+                        //Makes sure only customers can edit their information
+                        var orders = await OrderService.GetOrdersByCustomerIdAsync(existingCustomer.Id);
+                        hasOrders = orders != null && orders.Any();
                         StateHasChanged();
                     }
                 }
@@ -86,7 +97,7 @@
         await CustomerService.UpdateCustomerAsync(editingCustomer.Id, editingCustomer);
         if (originalCustomer.Email != editingCustomer.Email) 
         {
-            var user = await UserService.GetUserByEmailAsync(originalCustomer.Email); //original is null here for some reason
+            var user = await UserService.GetUserByEmailAsync(originalCustomer.Email);
             if (user != null)
             {
                 user.Email = editingCustomer.Email;

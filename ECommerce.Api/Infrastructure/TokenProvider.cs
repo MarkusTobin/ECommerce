@@ -36,7 +36,7 @@ namespace ECommerce.Api.Infrastructure
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, userId),
-                new Claim(JwtRegisteredClaimNames.UniqueName, email),//remove
+                new Claim(JwtRegisteredClaimNames.UniqueName, email),
                 new Claim(ClaimTypes.Role, role),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
