@@ -165,6 +165,7 @@ Below is a list of the available API endpoints along with the supported HTTP met
 
 #### POST /api/products
 - **Description**: Add a new product.
+- **Authorization**: Requires `Admin` role.
 - **Request Body**:
     ```json
     {
