@@ -1,10 +1,9 @@
-﻿# My API Documentation
+﻿# ECommerce API Specification
 
 ## Overview & Metadata
 
-- **API Name**: My API
+- **API Name**: ECommerce API
 - **Version**: v1
-- **Description**: A simple example of an ASP.NET Core Web API that manages customers, orders, products, and user authentication.
 - **Contact**: [support@example.com](mailto:support@example.com)
 
 ---
@@ -12,8 +11,6 @@
 ## Authentication & Authorization
 
 This API uses **JWT (JSON Web Token)** for authentication.
-
-### Example Authentication Header:
 
 ### Supported Authentication Methods:
 - Bearer Tokens (JWT)
@@ -217,7 +214,7 @@ Below is a list of the available API endpoints along with the supported HTTP met
     {
       "email": "user@example.com",
       "password": "password123",
-      "role": "admin"
+      "role": "Admin"
     }
     ```
 - **Response**:
@@ -238,7 +235,7 @@ Below is a list of the available API endpoints along with the supported HTTP met
     ```json
     {
       "email": "updateduser@example.com",
-      "role": "user"
+      "role": "User"
     }
     ```
 - **Response**:
