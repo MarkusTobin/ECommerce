@@ -84,9 +84,9 @@
     private async Task SaveEditCustomer()
     {
         await CustomerService.UpdateCustomerAsync(editingCustomer.Id, editingCustomer);
-        if (originalCustomer.Email != editingCustomer.Email)
+        if (originalCustomer.Email != editingCustomer.Email) 
         {
-            var user = await UserService.GetUserByEmailAsync(originalCustomer.Email);
+            var user = await UserService.GetUserByEmailAsync(originalCustomer.Email); //original is null here for some reason
             if (user != null)
             {
                 user.Email = editingCustomer.Email;

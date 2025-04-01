@@ -1,4 +1,5 @@
 ﻿@page "/admin"
+@using ECommerce.Frontend.Components.PagesComponents.AdminPageComponents
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 
@@ -9,13 +10,13 @@
             {
                 <MudTabs>
                     <MudTabPanel Text="Customers">
-                        <CustomerList />
+                        <CustomerList/>
                     </MudTabPanel>
                     <MudTabPanel Text="Orders">
-                        <OrderTable />
+                        <OrderTable/>
                     </MudTabPanel>
                     <MudTabPanel Text="Manage Products">
-                        <ProductManager />
+                        <ProductManager/>
                     </MudTabPanel>
                 </MudTabs>
             }

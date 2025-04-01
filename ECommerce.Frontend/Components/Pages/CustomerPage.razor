@@ -3,14 +3,23 @@
 @inject OrderService OrderService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
+@inject CustomerService CustomerService
 
-<EditCustomerComponent/>
-<YourOrdersComponent/>
-
+@if (isCustomer)
+{
+    <EditCustomerComponent />
+    <YourOrdersComponent />
+}
+else
+{
+    <h3>Customer Page</h3>
+    <p>Only customers can access this page.</p>
+}
 
 @code {
     private string? userRole;
     private bool isInitialized;
+    private bool isCustomer = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -28,5 +37,11 @@
             isInitialized = true;
             StateHasChanged();
         }
+    }
+
+    private async Task<bool> CheckIfUserIsCustomer(string email)
+    {
+        var customer = await CustomerService.GetCustomerByEmailAsync(email);
+        return customer != null;
     }
 }
