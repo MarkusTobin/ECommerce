@@ -1,0 +1,28 @@
+﻿@inject CartService CartService
+@inject NavigationManager NavigationManager
+
+<MudTable Items="cartItems" Hover="true">
+    <HeaderContent>
+        <MudTh>Product</MudTh>
+        <MudTh>Price</MudTh>
+        <MudTh>Quantity</MudTh>
+        <MudTh>Total</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Product">@context.Product.Name</MudTd>
+        <MudTd DataLabel="Price">@context.Product.Price.ToString("C")</MudTd>
+        <MudTd DataLabel="Quantity">@context.Quantity</MudTd>
+        <MudTd DataLabel="Total">@string.Format("{0:C}", @context.Product.Price * @context.Quantity)</MudTd>
+    </RowTemplate>
+</MudTable>
+
+<MudText Typo="Typo.h6">Total Price: @CartService.GetTotalPrice().ToString("C")</MudText>
+
+@code {
+    private List<CartItem> cartItems;
+
+    protected override void OnInitialized()
+    {
+        cartItems = CartService.GetCart();
+    }
+}

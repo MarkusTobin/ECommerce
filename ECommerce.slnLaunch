@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Start all",
+    "Projects": [
+      {
+        "Path": "ECommerce.Api\\ECommerce.Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "ECommerce.Frontend\\ECommerce.Frontend.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

@@ -1,0 +1,145 @@
+﻿@page "/"
+@inject ProductService ProductService
+@inject CartService CartService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Product List</PageTitle>
+<MudAutocomplete T="string" Label="Search" Placeholder="Find products.." SearchFunc="SearchProducts" ValueChanged="NavigateToProduct">
+    <ItemTemplate>
+        @((MarkupString)context)
+    </ItemTemplate>
+</MudAutocomplete>
+<h3>Products</h3>
+
+@if (products == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (products.Count == 0)
+{
+    <p>No products found.</p>
+}
+else
+{
+    <MudGrid>
+        @foreach (var product in products.Where(p => p.IsAvailable))
+        {
+            <MudItem xs="12" sm="6" md="4">
+                <MudCard>
+                    <MudCardContent>
+                        <MudLink Href="@($"/products/name/{product.Name}")">
+                            <MudText Typo="Typo.h6">@product.Name</MudText>
+                        </MudLink>                        <MudText Typo="Typo.body2">@product.Price.ToString("C")</MudText>
+
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => AddToCart(product, 1)">
+                            Add to Cart
+                        </MudButton>
+
+                        @if (userRole == "Admin")
+                        {
+                            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="() => MarkAsUnavailable(product)">
+                                Mark as Unavailable
+                            </MudButton>
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+    @if (userRole == "Admin" && products.Any(p => !p.IsAvailable))
+    {
+        <div style="position: fixed; bottom: 0; width: 100%; background-color: white;">
+        <h3>[Admin] Unavailable Products</h3>
+        <MudGrid>
+            @foreach (var product in products.Where(p => !p.IsAvailable))
+            {
+                <MudItem xs="12" sm="6" md="4">
+                    <MudCard>
+                        <MudCardContent>
+                            <MudLink Href="@($"/products/name/{product.Name}")">
+                                <MudText Typo="Typo.h6">@product.Name</MudText>
+                            </MudLink>
+                            <MudText Typo="Typo.body2">@product.Price.ToString("C")</MudText>
+                                <MudNumericField T="int" Label="Quantity" @bind-Value="product.Quantity" Min="1" />
+
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => MarkAsAvailable(product)">
+                                Mark as Available
+                            </MudButton>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+        </div>
+    }
+}
+
+@code {
+    private List<ProductDto> products;
+    private string? userRole;
+    private List<ProductDto> cart = new List<ProductDto>();
+    private ProductDto? selectedProduct;
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ProductService.GetAllProductsAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                var user = authState.User;
+                userRole = user.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
+                StateHasChanged();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+    }
+
+    private async Task<IEnumerable<string>> SearchProducts(string searchText, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(searchText))
+            return new List<string>();
+
+        return products?
+            .Where(p => p != null &&
+                        (p.Name != null && p.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                         p.ProductNumber != null && p.ProductNumber.Contains(searchText, StringComparison.OrdinalIgnoreCase)))
+            .Select(p => $"{p.Name} ({p.ProductNumber})")
+            .ToList() ?? new List<string>();
+    }
+
+
+    private void AddToCart(ProductDto product, int quantity)
+    {
+        if (quantity > 0)
+        {
+            CartService.AddToCart(product, quantity);
+        }
+    }
+    private async Task MarkAsUnavailable(ProductDto product)
+    {
+        product.IsAvailable = false;
+        await ProductService.UpdateProductAsync(product.Id, product);
+        StateHasChanged();
+    }
+    private async Task MarkAsAvailable(ProductDto product)
+    {
+        product.IsAvailable = true;
+        await ProductService.UpdateProductAsync(product.Id, product);
+        StateHasChanged();
+    }
+    private void NavigateToProduct(string selectedProduct)
+    {
+        var productName = selectedProduct.Split(' ')[0];
+        NavigationManager.NavigateTo($"/products/name/{productName}");
+    }
+}
