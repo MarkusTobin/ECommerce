@@ -60,31 +60,5 @@ namespace ECommerce.Api.Services
             var product = await _repository.GetProductByProductNumberAsync(productNumber);
             return product.ToProductDto();
         }
-
-        public async Task<bool> PurchaseProductAsync(string productId, int requestedQuantity)
-        {
-            var product = await _repository.GetByIdAsync(productId);
-
-            if (product == null)
-            {
-                throw new Exception("Product not found");
-            }
-
-            if (product.Quantity < requestedQuantity)
-            {
-                return false; 
-            }
-
-            product.Quantity -= requestedQuantity;
-
-            if (product.Quantity == 0)
-            {
-                product.IsAvailable = false;
-            }
-
-            await _repository.UpdateAsync(productId, product);
-
-            return true;
-        }
     }
 }

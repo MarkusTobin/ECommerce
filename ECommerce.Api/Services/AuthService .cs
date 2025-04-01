@@ -25,9 +25,9 @@ namespace ECommerce.Api.Services
             _passwordHashingService = passwordHashingService;
         }
 
-        public async Task<User> LoginAsync(UserLoginDto userLoginDto)
+        public async Task<User?> LoginAsync(UserLoginDto userLoginDto)
         {
-            var email = userLoginDto.Email.ToLowerInvariant(); 
+            var email = userLoginDto.Email?.ToLowerInvariant(); 
             var user = await _userRepository.GetUserByEmailAsync(email);
             if (user == null) return null;
 
