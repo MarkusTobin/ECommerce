@@ -26,4 +26,4 @@ In order to make this work, you'll need to add `appsettings.json` file in the `E
 }
 
 ```
-#### Api spec exists in 'ECommerce.Api/docs/Apispec.md'
+#### Api spec exists in `ECommerce.Api/docs/Apispec.md`
